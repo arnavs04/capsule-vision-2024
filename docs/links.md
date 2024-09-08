@@ -6,6 +6,7 @@ Challenge related questions: ask.misahub@gmail.com
 
 - [Registration form](https://forms.gle/QemRirWysnGoGrKM6)
 - [Challenge hosting website](https://misahub.in/cv2024.html)
+- [Own Website](https://cvip-2024.vercel.app/challenge)
 - [IIITDM Website](https://cvip2024.iiitdm.ac.in/challenge)
   
 ### Data
