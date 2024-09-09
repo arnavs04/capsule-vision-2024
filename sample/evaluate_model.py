@@ -1,6 +1,6 @@
 from tensorflow.keras.models import load_model
 import numpy as np
-from Eval_metrics_gen_excel import save_predictions_to_excel,generate_metrics_report
+from eval_metrics_gen_excel import save_predictions_to_excel,generate_metrics_report
 import pandas as pd
 from tensorflow.keras.preprocessing.image import load_img, img_to_array
 from tensorflow.keras.applications.vgg16 import preprocess_input
