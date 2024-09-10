@@ -14,5 +14,5 @@
 
 ## Other Imp. Things
 
--  Evaluation Metrics (_Mean Auc_, F1 Score, ROC-AUC)
+-  Evaluation Metrics (<u>Mean Auc</u>, F1 Score, ROC-AUC)
 -  10 Class Labels (Multi-Class Classification)
