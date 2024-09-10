@@ -10,9 +10,9 @@ from torch.utils.data import DataLoader
 NUM_WORKERS =  0 #os.cpu_count()
 
 class VCEDataset(Dataset):
-    def __init__(self, csv_file, root_dir, transform=None):
-        # Load annotations from the CSV file
-        self.annotations = pd.read_xslx(csv_file)
+    def __init__(self, xlsx_file, root_dir, transform=None):
+        # Load annotations from the XLSX file
+        self.annotations = pd.read_xslx(xlsx_file)
         self.root_dir = root_dir
         self.transform = transform
 
@@ -37,8 +37,8 @@ class VCEDataset(Dataset):
     
 
 def create_dataloaders(
-    train_csv: str,
-    test_csv: str,
+    train_xlsx: str,
+    test_xlsx: str,
     root_dir: str,
     transform: transforms.Compose,
     batch_size: int,
@@ -46,13 +46,13 @@ def create_dataloaders(
 ):
     # Create datasets
     train_dataset = VCEDataset(
-        csv_file=train_csv,
+        xlsx_file=train_xlsx,
         root_dir=root_dir,
         transform=transform,
     )
 
     test_dataset = VCEDataset(
-        csv_file=test_csv,
+        xlsx_file=test_xlsx,
         root_dir=root_dir,
         transform=transform,
     )
