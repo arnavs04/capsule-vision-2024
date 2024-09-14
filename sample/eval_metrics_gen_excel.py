@@ -8,12 +8,12 @@ from sklearn.metrics import classification_report, roc_auc_score, precision_reca
 def save_predictions_to_excel(image_paths, y_pred, output_path):
     class_columns = ['Angioectasia', 'Bleeding', 'Erosion', 'Erythema', 'Foreign Body', 'Lymphangiectasia', 'Normal', 'Polyp', 'Ulcer', 'Worms']
     y_pred_classes = np.argmax(y_pred, axis=1)
-    predicted_class_names = [class_columns[i] for i in y_pred_classes]
-    df_prob = pd.DataFrame(y_pred, columns=class_columns)
-    df_prob.insert(0, 'image_path', image_paths)
-    df_class = pd.DataFrame({'image_path': image_paths, 'predicted_class': predicted_class_names})
-    df_merged = pd.merge(df_prob, df_class, on='image_path')
-    df_merged.to_excel(output_path, index=False)
+    df = pd.DataFrame({
+        'image_path': image_paths,
+        'predicted_class': [class_columns[i] for i in y_pred_classes],
+        **{col: y_pred[:, i] for i, col in enumerate(class_columns)}
+    })
+    df.to_excel(output_path, index=False)
 
 
 def calculate_specificity(y_true, y_pred):
