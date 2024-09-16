@@ -1,15 +1,15 @@
 import os
-import random
 import gc
 import time
 import math
+import numpy as np
+import pandas as pd
+import random
 from pathlib import Path
 from logging import getLogger, INFO, StreamHandler, FileHandler, Formatter
 
 import torch
 from torch import nn
-
-import numpy as np
 
 
 def save_model(model: nn.Module, target_dir: str, model_name: str):
@@ -45,3 +45,13 @@ def model_size_mb(model: nn.Module):
     size_in_bytes = total_params * 4
     size_in_mb = size_in_bytes / (1024 ** 2)
     return size_in_mb
+
+def save_predictions_to_excel(image_paths, y_pred: torch.Tensor, output_path: str):
+    class_columns = ['Angioectasia', 'Bleeding', 'Erosion', 'Erythema', 'Foreign Body', 'Lymphangiectasia', 'Normal', 'Polyp', 'Ulcer', 'Worms']
+    y_pred_classes = y_pred.argmax(dim=1).cpu().numpy()
+    df = pd.DataFrame({
+        'image_path': image_paths,
+        'predicted_class': [class_columns[i] for i in y_pred_classes],
+        **{col: y_pred[:, i].cpu().numpy() for i, col in enumerate(class_columns)}
+    })
+    df.to_excel(output_path, index=False)

@@ -1,10 +1,10 @@
 import os
 import pandas as pd
 from PIL import Image
+
 import torch
 from torch.utils.data import Dataset
-
-from torchvision import datasets, transforms
+from torchvision import transforms
 from torch.utils.data import DataLoader
 
 NUM_WORKERS =  0 #os.cpu_count()
@@ -20,16 +20,12 @@ class VCEDataset(Dataset):
         return len(self.annotations)
 
     def __getitem__(self, index):
-        # Get the image path and load the image
         img_path = os.path.join(self.root_dir, self.annotations.iloc[index, 0])
         image = Image.open(img_path)
 
-        # Read the target columns (assumed to be from the third column onward)
         target = self.annotations.iloc[index, 2:].values
-        # Convert one-hot encoded target to a single class index
         y_label = torch.tensor(target.argmax(), dtype=torch.long)
 
-        # Apply any provided transformations
         if self.transform:
             image = self.transform(image)
 
