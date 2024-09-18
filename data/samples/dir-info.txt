@@ -1,0 +1,62 @@
+data/
+│
+├── checks/
+│   ├── training_data.xlsx
+│   ├── validation_data.xlsx
+│   └── dir-info.txt
+│
+├── training/
+│   ├── Angioectasia/
+│   │   ├── Kvasir/
+│   │   ├── SEE-AI/
+│   │   └── .../
+│   ├── Bleeding/
+│   │   ├── Kvasir/
+│   │   ├── SEE-AI/
+│   │   └── .../
+│   ├── Erosion/
+│   │   ├── Kvasir/
+│   │   ├── SEE-AI/
+│   │   └── .../
+│   ├── Erythema/
+│   │   ├── Kvasir/
+│   │   ├── SEE-AI/
+│   │   └── .../
+│   ├── Foreign Body/
+│   │   ├── Kvasir/
+│   │   ├── SEE-AI/
+│   │   └── .../
+│   ├── Lymphangiectasia/
+│   │   ├── Kvasir/
+│   │   ├── SEE-AI/
+│   │   └── .../
+│   ├── Normal/
+│   │   ├── Kvasir/
+│   │   ├── SEE-AI/
+│   │   └── .../
+│   ├── Polyp/
+│   │   ├── Kvasir/
+│   │   ├── SEE-AI/
+│   │   └── .../
+│   ├── Ulcer/
+│   │   ├── Kvasir/
+│   │   ├── SEE-AI/
+│   │   └── .../
+│   └── Worms/
+│       ├── Kvasir/
+│       ├── SEE-AI/
+│       └── .../
+│
+├── validation/
+│   ├── Angioectasia/
+│   │   ├── Kvasir/
+│   │   ├── SEE-AI/
+│   │   └── .../
+│   ├── Bleeding/
+│   │   ├── Kvasir/
+│   │   ├── SEE-AI/
+│   │   └── .../
+│   └── ... (other classes follow the same pattern)
+│
+├── check_dir.py
+└── data_collection.py
