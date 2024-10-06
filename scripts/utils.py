@@ -7,9 +7,31 @@ import pandas as pd
 import random
 from pathlib import Path
 from logging import getLogger, INFO, StreamHandler, FileHandler, Formatter
+from datetime import datetime
 
 import torch
 from torch import nn
+
+
+def setup_logger(model_name: str) -> getLogger:
+    log_dir = os.path.join("../capsule-vision-2024", "logs", model_name)
+    os.makedirs(log_dir, exist_ok=True)
+    log_file = os.path.join(log_dir, f"{datetime.now().strftime('%Y%m%d_%H%M%S')}.log")
+
+    logger = getLogger(model_name)
+    logger.setLevel(INFO)
+
+    file_handler = FileHandler(log_file)
+    stream_handler = StreamHandler()
+
+    formatter = Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    file_handler.setFormatter(formatter)
+    stream_handler.setFormatter(formatter)
+
+    logger.addHandler(file_handler)
+    logger.addHandler(stream_handler)
+
+    return logger
 
 
 def save_model(model: nn.Module, target_dir: str, model_name: str):

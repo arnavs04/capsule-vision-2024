@@ -7,14 +7,15 @@ from torch.utils.data import Dataset
 from torchvision import transforms
 from torch.utils.data import DataLoader
 
-NUM_WORKERS =  0 #os.cpu_count()
+NUM_WORKERS =  0 # os.cpu_count()
 
 class VCEDataset(Dataset):
-    def __init__(self, xlsx_file, root_dir, transform=None):
+    def __init__(self, xlsx_file, root_dir, train_or_test: str, transform=None):
         # Load annotations from the XLSX file
-        self.annotations = pd.read_xslx(xlsx_file)
         self.root_dir = root_dir
         self.transform = transform
+        self.xlsx_file_path = os.path.join(self.root_dir, train_or_test, xlsx_file)
+        self.annotations = pd.read_excel(io=self.xlsx_file_path, sheet_name=0)
 
     def __len__(self):
         return len(self.annotations)
@@ -35,7 +36,9 @@ class VCEDataset(Dataset):
 def create_dataloaders(
     train_xlsx: str,
     test_xlsx: str,
-    root_dir: str,
+    train_root_dir: str,
+    test_root_dir: str,
+    data_root_dir: str,
     transform: transforms.Compose,
     batch_size: int,
     num_workers: int = NUM_WORKERS
@@ -43,13 +46,15 @@ def create_dataloaders(
     # Create datasets
     train_dataset = VCEDataset(
         xlsx_file=train_xlsx,
-        root_dir=root_dir,
+        root_dir=data_root_dir,
+        train_or_test=train_root_dir,
         transform=transform,
     )
 
     test_dataset = VCEDataset(
         xlsx_file=test_xlsx,
-        root_dir=root_dir,
+        root_dir=data_root_dir,
+        train_or_test=test_root_dir,
         transform=transform,
     )
 

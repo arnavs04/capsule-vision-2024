@@ -43,7 +43,7 @@ def main():
     download_path = '../capsule-vision-2024/data/downloaded_file.zip'
     data_path = '../capsule-vision-2024/data'
     
-    os.makedirs(os.path.dirname(download_path), exist_ok=True)
+    # os.makedirs(os.path.dirname(download_path), exist_ok=True)
     
     if download_file(url, download_path):
         unzip_file(download_path, data_path)

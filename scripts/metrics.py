@@ -52,12 +52,12 @@ def generate_metrics_report(y_true: torch.Tensor, y_pred: torch.Tensor) -> str:
     class_columns = ['Angioectasia', 'Bleeding', 'Erosion', 'Erythema', 'Foreign Body', 'Lymphangiectasia', 'Normal', 'Polyp', 'Ulcer', 'Worms']
     metrics_report = {}
     
-    conf_matrix = confusion_matrix(y_true, y_pred)
+    conf_matrix = confusion_matrix(y_true.cpu(), y_pred.cpu())
     
-    tp = torch.diag(conf_matrix)
-    fp = torch.sum(conf_matrix, dim=0) - tp
-    fn = torch.sum(conf_matrix, dim=1) - tp
-    tn = torch.sum(conf_matrix) - (fp + fn + tp)
+    tp = torch.diag(torch.tensor(conf_matrix))
+    fp = torch.sum(torch.tensor(conf_matrix), dim=0) - tp
+    fn = torch.sum(torch.tensor(conf_matrix), dim=1) - tp
+    tn = torch.sum(torch.tensor(conf_matrix)) - (fp + fn + tp)
     
     precision = tp / (tp + fp + 1e-7)
     recall = tp / (tp + fn + 1e-7)
@@ -89,7 +89,7 @@ def generate_metrics_report(y_true: torch.Tensor, y_pred: torch.Tensor) -> str:
         except ValueError:
             average_precision_scores[class_name] = 0.0
     
-    metrics_report['accuracy'] = accuracy(y_true, y_pred)
+    metrics_report['accuracy'] = (y_true.cpu() == y_pred.cpu()).float().mean().item()
     metrics_report['macro avg'] = {
         'precision': precision.mean().item(),
         'recall': recall.mean().item(),
