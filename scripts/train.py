@@ -13,8 +13,8 @@ import torchvision
 from torchvision import transforms 
 
 # Script Imports
-import data_setup, engine, models.model_builder as model_builder, utils
-from models.model_builder import (
+import data_setup, engine
+from model_builder import (
     model_beit, 
     model_cswin, 
     model_swin, 
@@ -22,6 +22,7 @@ from models.model_builder import (
     model_resnet18,
     model_mobilenet_v2, 
 )
+from utils import *
 
 # Setup hyperparameters
 NUM_EPOCHS = 20
