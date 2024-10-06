@@ -103,11 +103,13 @@ for model_name, model in model_list.items():
         optimizer=optimizer,
         loss_fn=loss_fn,
         epochs=NUM_EPOCHS,
-        device=device, 
-        model_name=model_name,
+        device=device,
+        model_name=model_name,  # Model name to pass into logger and model saving
+        save_dir="../capsule-vision-2024/models",  # Directory to save models after every 5 epochs
     )
     
     # Store the results
     results_dict[model_name] = results
 
-# Results will contain training history for each model
+# After the training loop, results_dict will contain training history for each model
+print("Training complete for all models.")

@@ -3,9 +3,9 @@ from torch import nn, optim
 from typing import Dict, List, Tuple
 from torch.optim.lr_scheduler import CosineAnnealingLR
 from tqdm.auto import tqdm
-
 from utils import *
 from metrics import *
+from pathlib import Path
 
 
 def train_step(model: torch.nn.Module, 
@@ -75,7 +75,9 @@ def train(model: torch.nn.Module,
           loss_fn: torch.nn.Module,
           epochs: int,
           device: torch.device,
-          model_name: str) -> Dict[str, List]:
+          model_name: str,
+          save_dir: str = "../capsule-vision-2024/models") -> Dict[str, List]:
+    
     results = {
         "train_loss": [],
         "train_acc": [],
@@ -115,22 +117,38 @@ def train(model: torch.nn.Module,
         train_metrics = generate_metrics_report(train_labels, train_preds)
         test_metrics = generate_metrics_report(test_labels, test_preds)
 
+        # Log metrics for each epoch
         logger.info(f"Epoch: {epoch+1}")
         logger.info(f"Train Metrics:\n{train_metrics}")
         logger.info(f"Test Metrics:\n{test_metrics}")
 
         logger.info(
-          f"Epoch: {epoch+1} | "
-          f"train_loss: {train_loss:.4f} | "
-          f"train_acc: {train_acc:.4f} | "
-          f"test_loss: {test_loss:.4f} | "
-          f"test_acc: {test_acc:.4f}"
+            f"Epoch: {epoch+1} | "
+            f"train_loss: {train_loss:.4f} | "
+            f"train_acc: {train_acc:.4f} | "
+            f"test_loss: {test_loss:.4f} | "
+            f"test_acc: {test_acc:.4f}"
         )
 
+        # Save the model every 5 epochs
+        if (epoch + 1) % 5 == 0:
+            model_save_name = f"{model_name}_epoch_{epoch+1}.pth"
+            save_model(model, save_dir, model_save_name)
+            logger.info(f"Model checkpoint saved at epoch {epoch+1}")
+
+        # Save metrics report every epoch
+        combined_metrics = {
+            "epoch": epoch + 1,
+            "train_metrics": train_metrics,
+            "test_metrics": test_metrics
+        }
+        save_metrics_report(combined_metrics, model_name, epoch)
+
+        # Save metrics in the results dictionary
         results["train_loss"].append(train_loss)
         results["train_acc"].append(train_acc)
         results["test_loss"].append(test_loss)
         results["test_acc"].append(test_acc)
 
-    logger.info("Training completed")
+    logger.info(f"Training completed for model: {model_name}")
     return results

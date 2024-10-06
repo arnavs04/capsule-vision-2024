@@ -1,23 +1,45 @@
-import torch
-from torch import nn, optim
-from torchvision import models, transforms
-from torch.utils.data import DataLoader
+import torch.nn as nn
 import timm
+from torchvision import models
 
-model_resnet18 = models.resnet18(pretrained=True)
-model_resnet18.fc = nn.Linear(model_resnet18.fc.in_features, 10)
+# Define ResNet18 model
+def model_resnet18(pretrained=True, num_classes=10):
+    model = models.resnet18(pretrained=pretrained)
+    # Modify the fully connected layer to match num_classes
+    model.fc = nn.Linear(model.fc.in_features, num_classes)
+    return model
 
-model_inception_resnet_v2 = timm.create_model('inception_resnet_v2', pretrained=True)
-model_inception_resnet_v2.classifier = nn.Linear(model_inception_resnet_v2.classifier.in_features, 10)
+# Define InceptionResNetV2 model (using timm)
+def model_inception_resnet_v2(pretrained=True, num_classes=10):
+    model = timm.create_model('inception_resnet_v2', pretrained=pretrained)
+    # Modify the classifier to match num_classes
+    model.classif = nn.Linear(model.classif.in_features, num_classes)
+    return model
 
-model_mobilenet_v2 = models.mobilenet_v2(pretrained=True)
-model_mobilenet_v2.classifier[1] = nn.Linear(model_mobilenet_v2.classifier[1].in_features, 10)
+# Define MobileNetV2 model
+def model_mobilenet_v2(pretrained=True, num_classes=10):
+    model = models.mobilenet_v2(pretrained=pretrained)
+    # Modify the classifier to match num_classes
+    model.classifier[1] = nn.Linear(model.classifier[1].in_features, num_classes)
+    return model
 
-model_swin = timm.create_model('swin_base_patch4_window7_224', pretrained=True)
-model_swin.head = nn.Linear(model_swin.head.in_features, 10)
+# Define Swin Transformer model (using timm)
+def model_swin(pretrained=True, num_classes=10):
+    model = timm.create_model('swin_base_patch4_window7_224', pretrained=pretrained)
+    # Modify the head to match num_classes
+    model.head = nn.Linear(model.head.in_features, num_classes)
+    return model
 
-model_cswin = timm.create_model('cswin_base_224', pretrained=True)
-model_cswin.head = nn.Linear(model_cswin.head.in_features, 10)
+# Define CSwin Transformer model (using timm)
+def model_cswin(pretrained=True, num_classes=10):
+    model = timm.create_model('cswin_base_224', pretrained=pretrained)
+    # Modify the head to match num_classes
+    model.head = nn.Linear(model.head.in_features, num_classes)
+    return model
 
-model_beit = timm.create_model('beit_base_patch16_224', pretrained=True)
-model_beit.head = nn.Linear(model_beit.head.in_features, 10)
+# Define BEiT Transformer model (using timm)
+def model_beit(pretrained=True, num_classes=10):
+    model = timm.create_model('beit_base_patch16_224', pretrained=pretrained)
+    # Modify the head to match num_classes
+    model.head = nn.Linear(model.head.in_features, num_classes)
+    return model

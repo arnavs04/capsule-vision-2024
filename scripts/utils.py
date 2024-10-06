@@ -1,13 +1,17 @@
 import os
+import json
 import gc
 import time
 import math
+import random
+from datetime import datetime
+
+from pathlib import Path
+from typing import Dict, List, Tuple
+from logging import getLogger, INFO, StreamHandler, FileHandler, Formatter
+
 import numpy as np
 import pandas as pd
-import random
-from pathlib import Path
-from logging import getLogger, INFO, StreamHandler, FileHandler, Formatter
-from datetime import datetime
 
 import torch
 from torch import nn
@@ -43,6 +47,20 @@ def save_model(model: nn.Module, target_dir: str, model_name: str):
     model_save_path = target_dir_path / model_name
     print(f"[INFO] Saving model to: {model_save_path}")
     torch.save(obj=model.state_dict(), f=model_save_path)
+
+
+def save_metrics_report(report: Dict, model_name: str, epoch: int, save_dir: str = "../capsule-vision-2024/logs/reports"):
+    report_dir = os.path.join(save_dir, model_name)
+    os.makedirs(report_dir, exist_ok=True)  # Create the directory if it doesn't exist
+
+    report_filename = f"metrics_epoch_{epoch+1}.json"  # Save report for each epoch
+    report_path = os.path.join(report_dir, report_filename)
+    
+    # Save the report as a JSON file
+    with open(report_path, 'w') as report_file:
+        json.dump(report, report_file, indent=4)
+    
+    print(f"[INFO] Saved metrics report for {model_name}, epoch {epoch+1} at {report_path}")
 
 
 def is_torch_available():
