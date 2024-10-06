@@ -8,8 +8,8 @@
 
 ## Models
 *can be pre-trained, ensemble, and deep learning methods*
-- CNNs (ResNet, EfficientNet, VGGNet, etc.)
-- Vision Transformers (Deit, Swin)
+- CNNs (ResNet18, InceptionNetResNetv2, MobileNetv2)
+- Vision Transformers (Swin, CSwin, BEiT/DeiT)
 - Research Specific (Open up research papers to find transformers made exactly for specific tasks like this)
 
 ## Other Imp. Things
