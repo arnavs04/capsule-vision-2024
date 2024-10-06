@@ -63,6 +63,17 @@ def save_metrics_report(report: Dict, model_name: str, epoch: int, save_dir: str
     print(f"[INFO] Saved metrics report for {model_name}, epoch {epoch+1} at {report_path}")
 
 
+def save_predictions_to_excel(image_paths, y_pred: torch.Tensor, output_path: str):
+    class_columns = ['Angioectasia', 'Bleeding', 'Erosion', 'Erythema', 'Foreign Body', 'Lymphangiectasia', 'Normal', 'Polyp', 'Ulcer', 'Worms']
+    y_pred_classes = y_pred.argmax(dim=1).cpu().numpy()
+    df = pd.DataFrame({
+        'image_path': image_paths,
+        'predicted_class': [class_columns[i] for i in y_pred_classes],
+        **{col: y_pred[:, i].cpu().numpy() for i, col in enumerate(class_columns)}
+    })
+    df.to_excel(output_path, index=False)
+
+
 def is_torch_available():
     return torch is not None
 
@@ -85,13 +96,3 @@ def model_size_mb(model: nn.Module):
     size_in_bytes = total_params * 4
     size_in_mb = size_in_bytes / (1024 ** 2)
     return size_in_mb
-
-def save_predictions_to_excel(image_paths, y_pred: torch.Tensor, output_path: str):
-    class_columns = ['Angioectasia', 'Bleeding', 'Erosion', 'Erythema', 'Foreign Body', 'Lymphangiectasia', 'Normal', 'Polyp', 'Ulcer', 'Worms']
-    y_pred_classes = y_pred.argmax(dim=1).cpu().numpy()
-    df = pd.DataFrame({
-        'image_path': image_paths,
-        'predicted_class': [class_columns[i] for i in y_pred_classes],
-        **{col: y_pred[:, i].cpu().numpy() for i, col in enumerate(class_columns)}
-    })
-    df.to_excel(output_path, index=False)
