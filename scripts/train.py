@@ -16,7 +16,6 @@ from torchvision import transforms
 import data_setup, engine
 from model_builder import (
     model_beit, 
-    model_cswin, 
     model_swin, 
     model_inception_resnet_v2,
     model_resnet18,
@@ -36,12 +35,11 @@ data_dir = "../capsule-vision-2024/data/Dataset"
 train_dir = "training"
 test_dir = "validation"
 train_xlsx_filename = "training_data.xlsx"
-test_xslx_filename = "validation_data.xslx"
+test_xlsx_filename = "validation_data.xlsx"
 
 # Setup target device
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
-# Define data transformations
 data_transform = transforms.Compose([
     transforms.Resize((224, 224)),
     transforms.RandomHorizontalFlip(p=0.5),
@@ -50,16 +48,16 @@ data_transform = transforms.Compose([
     transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1),
     transforms.RandomAffine(degrees=0, translate=(0.1, 0.1), scale=(0.9, 1.1)),
     transforms.RandomPerspective(distortion_scale=0.2, p=0.5),
-    transforms.RandomErasing(p=0.2, scale=(0.02, 0.33), ratio=(0.3, 3.3), value='random'),
-    transforms.ToTensor(),
+    transforms.ToTensor(),  # Convert the image to a tensor here
     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+    transforms.RandomErasing(p=0.2, scale=(0.02, 0.33), ratio=(0.3, 3.3), value='random'),
     transforms.RandomApply([transforms.GaussianBlur(kernel_size=3)], p=0.3)
 ])
 
 # Create DataLoaders with help from data_setup.py
 train_loader, test_loader = data_setup.create_dataloaders(
     train_xlsx=train_xlsx_filename,
-    test_xlsx=test_xslx_filename,
+    test_xlsx=test_xlsx_filename,
     train_root_dir=train_dir,
     test_root_dir=test_dir,
     data_root_dir=data_dir,
@@ -77,7 +75,7 @@ model_list = {
     "InceptionResNetV2": model_inception_resnet_v2(pretrained=True, num_classes=len(class_columns)),
     "MobileNetV2": model_mobilenet_v2(pretrained=True, num_classes=len(class_columns)),
     "Swin Transformer": model_swin(pretrained=True, num_classes=len(class_columns)),
-    "CSwin Transformer": model_cswin(pretrained=True, num_classes=len(class_columns)),
+    # "CSwin Transformer": model_cswin(pretrained=True, num_classes=len(class_columns)),
     "BEiT": model_beit(pretrained=True, num_classes=len(class_columns))
 }
 

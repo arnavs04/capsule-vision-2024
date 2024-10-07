@@ -7,7 +7,7 @@ from torch.utils.data import Dataset
 from torchvision import transforms
 from torch.utils.data import DataLoader
 
-NUM_WORKERS =  0 # os.cpu_count()
+NUM_WORKERS = 0 # os.cpu_count()
 
 
 class VCEDataset(Dataset):
@@ -22,7 +22,7 @@ class VCEDataset(Dataset):
         return len(self.annotations)
 
     def __getitem__(self, index):
-        img_path = os.path.join(self.root_dir, self.annotations.iloc[index, 0])
+        img_path = os.path.join(self.root_dir, self.annotations.iloc[index, 0].replace("\\", "/"))
         image = Image.open(img_path)
 
         target = self.annotations.iloc[index, 2:].values
