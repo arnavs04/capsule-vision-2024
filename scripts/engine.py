@@ -152,4 +152,10 @@ def train(model: torch.nn.Module,
         results["test_acc"].append(test_acc)
 
     logger.info(f"Training completed for model: {model_name}")
+
+    del model  # Delete model
+    del optimizer  # Delete optimizer
+    torch.cuda.empty_cache()  # Clear cached memory
+    torch.cuda.synchronize() 
+    
     return results
