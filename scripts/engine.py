@@ -10,14 +10,15 @@ def train_step(model: nn.Module,
                dataloader: torch.utils.data.DataLoader, 
                loss_fn: nn.Module, 
                optimizer: optim.Optimizer,
-               device: torch.device) -> Tuple[float, float, torch.Tensor, torch.Tensor]:
+               device: torch.device, 
+               epoch_progress: tqdm) -> Tuple[float, float, torch.Tensor, torch.Tensor]:
     model.train()
     train_loss, correct = 0, 0
     total = 0
     all_predictions = []
     all_labels = []
 
-    for X, y in dataloader:
+    for batch_idx, (X, y) in enumerate(dataloader):
         X, y = X.to(device), y.to(device)
         optimizer.zero_grad(set_to_none=True)  # More efficient than optimizer.zero_grad()
 
@@ -34,6 +35,9 @@ def train_step(model: nn.Module,
         all_predictions.append(predicted)
         all_labels.append(y)
 
+        # Update the epoch progress bar description with batch information
+        epoch_progress.set_postfix(batch=batch_idx + 1, loss=loss.item())
+
     train_loss /= total
     train_acc = correct / total
     return train_loss, train_acc, torch.cat(all_predictions), torch.cat(all_labels)
@@ -41,7 +45,8 @@ def train_step(model: nn.Module,
 def test_step(model: nn.Module, 
               dataloader: torch.utils.data.DataLoader, 
               loss_fn: nn.Module,
-              device: torch.device) -> Tuple[float, float, torch.Tensor, torch.Tensor]:
+              device: torch.device,
+              epoch_progress: tqdm) -> Tuple[float, float, torch.Tensor, torch.Tensor]:
     model.eval()
     test_loss, correct = 0, 0
     total = 0
@@ -49,7 +54,7 @@ def test_step(model: nn.Module,
     all_labels = []
 
     with torch.inference_mode():
-        for X, y in dataloader:
+        for batch_idx, (X, y) in enumerate(dataloader):
             X, y = X.to(device), y.to(device)
 
             y_pred = model(X)
@@ -62,6 +67,9 @@ def test_step(model: nn.Module,
 
             all_predictions.append(predicted)
             all_labels.append(y)
+
+            # Update the epoch progress bar description with batch information
+            epoch_progress.set_postfix(batch=batch_idx + 1, loss=loss.item())
 
     test_loss /= total
     test_acc = correct / total
@@ -89,12 +97,14 @@ def train(model: torch.nn.Module,
     logger = setup_logger(model_name)
     logger.info(f"Training started for model: {model_name}")
 
-    for epoch in range(epochs):
+    # Create a tqdm progress bar for epochs
+    for epoch in tqdm(range(epochs), desc="Epoch"):
+        # Call train_step and test_step with the epoch progress bar
         train_loss, train_acc, train_preds, train_labels = train_step(
-            model, train_dataloader, loss_fn, optimizer, device
+            model, train_dataloader, loss_fn, optimizer, device, epoch_progress=tqdm.write
         )
         test_loss, test_acc, test_preds, test_labels = test_step(
-            model, test_dataloader, loss_fn, device
+            model, test_dataloader, loss_fn, device, epoch_progress=tqdm.write
         )
 
         scheduler.step()
