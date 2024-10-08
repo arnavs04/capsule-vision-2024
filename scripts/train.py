@@ -29,7 +29,7 @@ NUM_EPOCHS = 20
 BATCH_SIZE = 32
 HIDDEN_UNITS = 32
 LEARNING_RATE = 0.003
-NUM_WORKERS = 0
+NUM_WORKERS = 4
 
 # Setup directories
 # data_dir = "../capsule-vision-2024/data/Dataset"
@@ -83,7 +83,6 @@ model_list = {
     "InceptionResNetV2": model_inception_resnet_v2(pretrained=True, num_classes=len(class_columns)),
     "MobileNetV2": model_mobilenet_v2(pretrained=True, num_classes=len(class_columns)),
     "Swin Transformer": model_swin(pretrained=True, num_classes=len(class_columns)),
-    # "CSwin Transformer": model_cswin(pretrained=True, num_classes=len(class_columns)),
     "BEiT": model_beit(pretrained=True, num_classes=len(class_columns))
 }
 print("Models Loaded!\n\n")
