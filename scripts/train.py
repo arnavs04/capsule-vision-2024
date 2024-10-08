@@ -32,12 +32,14 @@ LEARNING_RATE = 0.003
 NUM_WORKERS = 0
 
 # Setup directories
-data_dir = "../capsule-vision-2024/data/Dataset"
+# data_dir = "../capsule-vision-2024/data/Dataset"
+data_dir="kaggle/input/capsule-vision-2024-data/Dataset"
 train_dir = "training"
 test_dir = "validation"
 train_xlsx_filename = "training_data.xlsx"
 test_xlsx_filename = "validation_data.xlsx"
-save_dir = "../capsule-vision-2024/models"
+# save_dir = "../capsule-vision-2024/models"
+save_dir="kaggle/working/models"
 
 # Setup target device
 device = "cuda" if torch.cuda.is_available() else "cpu"
