@@ -6,16 +6,22 @@ from tensorflow.keras.preprocessing.image import load_img, img_to_array
 from tensorflow.keras.applications.vgg16 import preprocess_input
 import os
 import platform
+
+
 model_path= os.path.join(os.getcwd(),'sample evaluation by organizing members','VGG16','model.keras')
 #this only works for .keras and .h5 models
 model = load_model(model_path)
 #modify according to the model type being used
 #these data loading functions are specific to VGG16, modify accordingly 
+
+
 def load_and_preprocess_image(full_path, target_size):
     img = load_img(full_path, target_size=target_size)
     img_array = img_to_array(img)
     preprocessed_img = preprocess_input(img_array)
     return preprocessed_img
+
+
 def get_data(excel_path, base_dir, image_size=(32, 32)):
     df = pd.read_excel(excel_path)
     df = df.dropna(subset=['image_path'])
@@ -28,10 +34,14 @@ def get_data(excel_path, base_dir, image_size=(32, 32)):
     X = np.array([load_and_preprocess_image(os.path.join(base_dir, path), image_size) for path in df['image_path'].values])
     y = df[class_columns].values
     return X, y, df
+
+
 def load_test_data(test_dir, image_size=(32, 32)):
     image_paths = [os.path.join(test_dir, fname) for fname in os.listdir(test_dir) if fname.lower().endswith(('jpg'))]
     X_test = np.array([load_and_preprocess_image(path, image_size) for path in image_paths])
     return X_test, image_paths
+
+
 #these parameters are also specific to the sample being shown here and can be changed
 base_dir = os.path.join(os.getcwd(),'Dataset')
 val_excel_path = os.path.join(os.getcwd(), 'Dataset', 'validation', 'validation_data.xlsx')
