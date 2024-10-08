@@ -5,20 +5,19 @@ from torch.optim.lr_scheduler import CosineAnnealingLR
 from tqdm.auto import tqdm
 from utils import *
 from metrics import *
-from pathlib import Path
 
 
-def train_step(model: torch.nn.Module, 
+def train_step(model: nn.Module, 
                dataloader: torch.utils.data.DataLoader, 
-               loss_fn: torch.nn.Module, 
-               optimizer: torch.optim.Optimizer,
+               loss_fn: nn.Module, 
+               optimizer: optim.Optimizer,
                device: torch.device) -> Tuple[float, float, torch.Tensor, torch.Tensor]:
     model.train()
     train_loss, train_acc = 0, 0
     all_predictions = []
     all_labels = []
 
-    for batch, (X, y) in enumerate(dataloader):
+    for batch, (X, y) in enumerate(tqdm(dataloader, desc="Batch", leave=False, position=1)):
         X, y = X.to(device), y.to(device)
 
         y_pred = model(X)
@@ -40,9 +39,9 @@ def train_step(model: torch.nn.Module,
     return train_loss, train_acc, torch.cat(all_predictions), torch.cat(all_labels)
 
 
-def test_step(model: torch.nn.Module, 
+def test_step(model: nn.Module, 
               dataloader: torch.utils.data.DataLoader, 
-              loss_fn: torch.nn.Module,
+              loss_fn: nn.Module,
               device: torch.device) -> Tuple[float, float, torch.Tensor, torch.Tensor]:
     model.eval() 
     test_loss, test_acc = 0, 0
@@ -95,7 +94,8 @@ def train(model: torch.nn.Module,
 
     logger.info(f"Training started for model: {model_name}")
 
-    for epoch in tqdm(range(epochs)):
+    for epoch in tqdm(range(epochs), desc="Epoch"):
+        # print("Training Setp") #
         train_loss, train_acc, train_preds, train_labels = train_step(
             model=model,
             dataloader=train_dataloader,
@@ -103,6 +103,7 @@ def train(model: torch.nn.Module,
             optimizer=optimizer,
             device=device
         )
+        # print("Test Setp") #
         test_loss, test_acc, test_preds, test_labels = test_step(
             model=model,
             dataloader=test_dataloader,
