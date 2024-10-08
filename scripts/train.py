@@ -37,6 +37,7 @@ train_dir = "training"
 test_dir = "validation"
 train_xlsx_filename = "training_data.xlsx"
 test_xlsx_filename = "validation_data.xlsx"
+save_dir = "../capsule-vision-2024/models"
 
 # Setup target device
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -110,7 +111,7 @@ for model_name, model in model_list.items():
         epochs=NUM_EPOCHS,
         device=device,
         model_name=model_name,  # Model name to pass into logger and model saving
-        save_dir="../capsule-vision-2024/models",  # Directory to save models after every 5 epochs
+        save_dir=save_dir,  # Directory to save models after every 5 epochs
     )
     
     # Store the results

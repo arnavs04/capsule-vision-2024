@@ -16,9 +16,10 @@ import pandas as pd
 import torch
 from torch import nn
 
+logging_dir = "../capsule-vision-2024/logs"
 
 def setup_logger(model_name: str) -> getLogger:
-    log_dir = os.path.join("../capsule-vision-2024", "logs", model_name)
+    log_dir = os.path.join(logging_dir, model_name)
     os.makedirs(log_dir, exist_ok=True)
     log_file = os.path.join(log_dir, f"{datetime.now().strftime('%Y%m%d_%H%M%S')}.log")
 

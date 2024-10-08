@@ -75,7 +75,7 @@ def train(model: torch.nn.Module,
           epochs: int,
           device: torch.device,
           model_name: str,
-          save_dir: str = "../capsule-vision-2024/models") -> Dict[str, List]:
+          save_dir: str) -> Dict[str, List]:
     
     results = {
         "train_loss": [],
@@ -133,7 +133,7 @@ def train(model: torch.nn.Module,
 
         # Save the model every 5 epochs
         if (epoch + 1) % 5 == 0:
-            model_save_name = f"{model_name}_epoch_{epoch+1}.pth"
+            model_save_name = f"{model_name}.pth"
             save_model(model, save_dir, model_save_name)
             logger.info(f"Model checkpoint saved at epoch {epoch+1}")
 
@@ -157,5 +157,5 @@ def train(model: torch.nn.Module,
     del optimizer  # Delete optimizer
     torch.cuda.empty_cache()  # Clear cached memory
     torch.cuda.synchronize() 
-    
+
     return results
