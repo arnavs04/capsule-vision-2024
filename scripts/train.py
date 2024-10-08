@@ -22,6 +22,7 @@ from model_builder import (
     model_mobilenet_v2, 
 )
 from utils import *
+print("Libraries Imported Successfuly!\n\n")
 
 # Setup hyperparameters
 NUM_EPOCHS = 20
@@ -39,6 +40,8 @@ test_xlsx_filename = "validation_data.xlsx"
 
 # Setup target device
 device = "cuda" if torch.cuda.is_available() else "cpu"
+print(f"Device: {device}\n\n")
+
 
 data_transform = transforms.Compose([
     transforms.Resize((224, 224)),
@@ -65,6 +68,8 @@ train_loader, test_loader = data_setup.create_dataloaders(
     batch_size=BATCH_SIZE,
     num_workers=NUM_WORKERS,
 )
+print("Data Loaded!\n\n")
+
 
 # Class labels (assuming these are your target classes)
 class_columns = ['Angioectasia', 'Bleeding', 'Erosion', 'Erythema', 'Foreign Body', 'Lymphangiectasia', 'Normal', 'Polyp', 'Ulcer', 'Worms']
@@ -78,6 +83,8 @@ model_list = {
     # "CSwin Transformer": model_cswin(pretrained=True, num_classes=len(class_columns)),
     "BEiT": model_beit(pretrained=True, num_classes=len(class_columns))
 }
+print("Models Loaded!\n\n")
+
 
 # Dictionary to store results for each model
 results_dict = {}
