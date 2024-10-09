@@ -40,7 +40,11 @@ def train_step(model: nn.Module,
         all_labels.append(y)
 
         # Update the epoch progress bar description with batch information
-        epoch_progress.set_postfix(batch=f"{batch_idx+1}/{len(dataloader)}", loss=f"{loss.item():.4f}")
+        epoch_progress.set_postfix(
+            batch=f"{batch_idx + 1}/{len(dataloader)}", 
+            loss=f"{loss.item():.4f}", 
+            mode="training"
+        )
 
     train_loss /= total
     train_acc = correct / total
@@ -81,7 +85,11 @@ def test_step(model: nn.Module,
             all_labels.append(y)
 
             # Update the epoch progress bar description with batch information
-            epoch_progress.set_postfix(batch=f"{batch_idx+1}/{len(dataloader)}", loss=f"{loss.item():.4f}")
+            epoch_progress.set_postfix(
+                batch=f"{batch_idx + 1}/{len(dataloader)}", 
+                loss=f"{loss.item():.4f}", 
+                mode="validation"
+            )
 
     test_loss /= total
     test_acc = correct / total
