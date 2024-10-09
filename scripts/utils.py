@@ -14,7 +14,7 @@ import torch
 from torch import nn
 
 logging_dir = "../capsule-vision-2024/logs"
-logging_dir=save_dir="kaggle/working/logs"
+logging_dir="kaggle/working/logs"
 
 def setup_logger(model_name: str) -> getLogger:
     log_dir = os.path.join(logging_dir, model_name)
