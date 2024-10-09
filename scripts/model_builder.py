@@ -27,19 +27,10 @@ def model_mobilenet_v2(pretrained=True, num_classes=10):
     return model
 
 
-# Define Swin Transformer model (using timm)
 def model_swin(pretrained=True, num_classes=10):
     model = timm.create_model('swin_base_patch4_window7_224', pretrained=pretrained)
-    # Modify the head to match num_classes
-    model.head = nn.Linear(model.head.in_features, num_classes)
-    return model
-
-
-# Define CSwin Transformer model (using timm)
-def model_cswin(pretrained=True, num_classes=10):
-    model = timm.create_model('cswin_base_224', pretrained=pretrained)
-    # Modify the head to match num_classes
-    model.head = nn.Linear(model.head.in_features, num_classes)
+    original_head_input_features = model.head.fc.in_features
+    model.head.fc = nn.Linear(original_head_input_features, num_classes)
     return model
 
 
@@ -49,3 +40,13 @@ def model_beit(pretrained=True, num_classes=10):
     # Modify the head to match num_classes
     model.head = nn.Linear(model.head.in_features, num_classes)
     return model
+
+import torch
+
+# Test the models with random input
+input_tensor = torch.randn(1, 3, 224, 224)  # Batch size of 1, 3 color channels, 224x224 image size
+
+# Swin Transformer
+swin_model = model_resnet18()
+output = swin_model(input_tensor)
+print("Swin Transformer Output Shape:", output.shape)  # Should be [1, 10]

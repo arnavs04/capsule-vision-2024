@@ -5,7 +5,7 @@ from torch.utils.data import DataLoader
 from typing import Dict, List, Tuple
 from tqdm import tqdm
 from utils import *
-from metrics import *
+from metrics import generate_metrics_report  # Make sure to import the function here
 
 def train_step(model: nn.Module, 
                dataloader: DataLoader, 
@@ -23,17 +23,20 @@ def train_step(model: nn.Module,
         X, y = X.to(device), y.to(device)
         optimizer.zero_grad(set_to_none=True)
 
-        y_pred = model(X)
-        loss = loss_fn(y_pred, y)
+        y_pred_logits = model(X)  # Get model logits
+        print(f"y_pred_logits shape after model: {y_pred_logits.shape}")  # Debug shape
+        
+        loss = loss_fn(y_pred_logits, y)
         loss.backward()
         optimizer.step()
 
         train_loss += loss.item() * X.size(0)
-        _, predicted = y_pred.max(1)
+        _, predicted = y_pred_logits.max(1)
         total += y.size(0)
         correct += predicted.eq(y).sum().item()
 
-        all_predictions.append(predicted)
+        # Collect logits instead of raw predictions
+        all_predictions.append(y_pred_logits)  # Append logits
         all_labels.append(y)
 
         # Update the epoch progress bar description with batch information
@@ -41,7 +44,12 @@ def train_step(model: nn.Module,
 
     train_loss /= total
     train_acc = correct / total
-    return train_loss, train_acc, torch.cat(all_predictions), torch.cat(all_labels)
+    
+    # Concatenate along the first dimension to create a tensor of shape [total_samples, num_classes]
+    train_preds = torch.cat(all_predictions, dim=0)  # Shape [total_samples, num_classes]
+    train_labels = torch.cat(all_labels, dim=0)     # Shape [total_samples]
+
+    return train_loss, train_acc, train_preds, train_labels
 
 def test_step(model: nn.Module, 
               dataloader: DataLoader, 
@@ -58,15 +66,18 @@ def test_step(model: nn.Module,
         for batch_idx, (X, y) in enumerate(dataloader):
             X, y = X.to(device), y.to(device)
 
-            y_pred = model(X)
-            loss = loss_fn(y_pred, y)
+            y_pred_logits = model(X)  # Get model logits
+            print(f"y_pred_logits shape after model: {y_pred_logits.shape}")  # Debug shape
+            
+            loss = loss_fn(y_pred_logits, y)
 
             test_loss += loss.item() * X.size(0)
-            _, predicted = y_pred.max(1)
+            _, predicted = y_pred_logits.max(1)
             total += y.size(0)
             correct += predicted.eq(y).sum().item()
 
-            all_predictions.append(predicted)
+            # Collect logits instead of raw predictions
+            all_predictions.append(y_pred_logits)  # Append logits
             all_labels.append(y)
 
             # Update the epoch progress bar description with batch information
@@ -74,7 +85,12 @@ def test_step(model: nn.Module,
 
     test_loss /= total
     test_acc = correct / total
-    return test_loss, test_acc, torch.cat(all_predictions), torch.cat(all_labels)
+    
+    # Concatenate along the first dimension to create a tensor of shape [total_samples, num_classes]
+    test_preds = torch.cat(all_predictions, dim=0)  # Shape [total_samples, num_classes]
+    test_labels = torch.cat(all_labels, dim=0)      # Shape [total_samples]
+
+    return test_loss, test_acc, test_preds, test_labels
 
 def train(model: nn.Module, 
           train_dataloader: DataLoader, 
@@ -110,9 +126,13 @@ def train(model: nn.Module,
 
         scheduler.step()
 
+        # Apply softmax to convert logits to probabilities for metrics reporting
+        train_preds_probs = torch.softmax(train_preds, dim=1)  # Shape [total_samples, num_classes]
+        test_preds_probs = torch.softmax(test_preds, dim=1)    # Shape [total_samples, num_classes]
+
         # Generate and log metrics
-        train_metrics = generate_metrics_report(train_labels, train_preds)
-        test_metrics = generate_metrics_report(test_labels, test_preds)
+        train_metrics = generate_metrics_report(train_labels, train_preds_probs)
+        test_metrics = generate_metrics_report(test_labels, test_preds_probs)
 
         logger.info(f"Epoch: {epoch+1}")
         logger.info(f"Train Metrics:\n{train_metrics}")

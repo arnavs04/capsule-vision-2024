@@ -103,7 +103,7 @@ for model_name, model in model_list.items():
     
     # Define optimizer (AdamW as an example) and loss function (Cross Entropy)
     optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4, weight_decay=0.05)
-    loss_fn = F.cross_entropy
+    loss_fn = nn.CrossEntropyLoss()
     
     # Train the model using engine.train function
     results = engine.train(
