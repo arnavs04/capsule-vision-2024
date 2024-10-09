@@ -127,7 +127,7 @@ def train(model: nn.Module,
 
         # Save model checkpoint
         if (epoch + 1) % 5 == 0:
-            save_model(model, save_dir, f"{model_name}_{epoch+1}.pth")
+            save_model(model, save_dir, f"{model_name}.pth")
             logger.info(f"Model checkpoint saved at epoch {epoch+1}")
 
         # Save metrics report

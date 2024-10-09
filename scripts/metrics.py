@@ -2,6 +2,7 @@ import torch
 import torchmetrics
 import json
 from typing import List
+import torch.nn.functional as F
 
 class MetricsCalculator:
     def __init__(self, num_classes: int, class_names: List[str]):
@@ -32,23 +33,20 @@ class MetricsCalculator:
         if self.metrics is None or next(iter(self.metrics.values())).device != device:
             self._initialize_metrics(device)
 
-        # Convert y_true to class indices if it's one-hot encoded
-        if y_true.dim() == 2 and y_true.shape[1] > 1:
-            y_true = y_true.argmax(dim=1)
+        # Ensure y_pred has shape [batch_size, num_classes] (logits or probabilities)
+        if y_pred.dim() == 1:  # If y_pred is 1D, we need to raise an error
+            raise ValueError(f"y_pred must have shape [batch_size, num_classes], but got {y_pred.shape}.")
 
-        return {name: metric(y_pred, y_true) for name, metric in self.metrics.items()}
-
-    def generate_metrics_report(self, y_true: torch.Tensor, y_pred: torch.Tensor) -> str:
-        # Ensure y_pred has the correct shape (batch_size, num_classes)
-        if y_pred.dim() == 1:
-            y_pred = y_pred.unsqueeze(1)
-        if y_pred.dim() == 2 and y_pred.shape[1] == 1:
-            y_pred = torch.cat([1 - y_pred, y_pred], dim=1)
-        
-        # Ensure y_true has the correct shape (batch_size,)
+        # Ensure y_true is a long tensor with shape [batch_size]
+        y_true = y_true.long()
         if y_true.dim() == 2:
             y_true = y_true.squeeze(1)
-        
+
+        # Calculate and return metrics
+        return {name: metric(y_pred, y_true) for name, metric in self.metrics.items()}
+
+
+    def generate_metrics_report(self, y_true: torch.Tensor, y_pred: torch.Tensor) -> str:
         metrics_values = self.compute_metrics(y_true, y_pred)
 
         metrics_report = {}
