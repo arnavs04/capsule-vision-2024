@@ -18,6 +18,7 @@ from model_builder import (
 
 ## INCOMPLETE
 
+
 def load_model(model_class, model_path, device):
     """Load the trained model from a specified path."""
     model = model_class()  # Replace with your model initialization
@@ -25,6 +26,7 @@ def load_model(model_class, model_path, device):
     model.eval()
     model.to(device)
     return model
+
 
 def preprocess_data(data_dir):
     """Preprocess the VCE dataset for inference."""
@@ -36,6 +38,7 @@ def preprocess_data(data_dir):
     dataset = ImageFolder(root=data_dir, transform=transform)
     dataloader = DataLoader(dataset, batch_size=32, shuffle=False)  # Adjust batch size as necessary
     return dataloader, dataset.class_to_idx
+
 
 def run_inference(model, dataloader, device):
     """Run inference on the dataset and collect predictions and true labels."""
@@ -59,6 +62,7 @@ def run_inference(model, dataloader, device):
     labels = torch.cat(all_labels, dim=0)
     
     return labels, predictions
+
 
 def main(data_dir, model_path):
     """Main function to run inference."""

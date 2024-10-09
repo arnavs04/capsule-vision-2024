@@ -8,6 +8,7 @@ from torch.utils.data import Dataset, DataLoader
 from torch.utils.data.sampler import WeightedRandomSampler
 from torchvision import transforms
 
+
 class VCEDataset(Dataset):
     def __init__(self, xlsx_file, root_dir, train_or_test: str, transform=None):
         self.root_dir = root_dir

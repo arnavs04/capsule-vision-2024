@@ -41,12 +41,12 @@ def model_beit(pretrained=True, num_classes=10):
     model.head = nn.Linear(model.head.in_features, num_classes)
     return model
 
-import torch
+# import torch
 
-# Test the models with random input
-input_tensor = torch.randn(1, 3, 224, 224)  # Batch size of 1, 3 color channels, 224x224 image size
+# # Test the models with random input
+# input_tensor = torch.randn(1, 3, 224, 224)  # Batch size of 1, 3 color channels, 224x224 image size
 
-# Swin Transformer
-swin_model = model_resnet18()
-output = swin_model(input_tensor)
-print("Swin Transformer Output Shape:", output.shape)  # Should be [1, 10]
+# # Swin Transformer
+# swin_model = model_resnet18()
+# output = swin_model(input_tensor)
+# print("Swin Transformer Output Shape:", output.shape)  # Should be [1, 10]

@@ -7,6 +7,7 @@ from tqdm import tqdm
 from utils import *
 from metrics import generate_metrics_report  # Make sure to import the function here
 
+
 def train_step(model: nn.Module, 
                dataloader: DataLoader, 
                loss_fn: nn.Module, 
@@ -55,6 +56,7 @@ def train_step(model: nn.Module,
 
     return train_loss, train_acc, train_preds, train_labels
 
+
 def test_step(model: nn.Module, 
               dataloader: DataLoader, 
               loss_fn: nn.Module,
@@ -99,6 +101,7 @@ def test_step(model: nn.Module,
     test_labels = torch.cat(all_labels, dim=0)      # Shape [total_samples]
 
     return test_loss, test_acc, test_preds, test_labels
+
 
 def train(model: nn.Module, 
           train_dataloader: DataLoader, 

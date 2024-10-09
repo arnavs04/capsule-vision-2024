@@ -4,6 +4,7 @@ import json
 from typing import List
 import torch.nn.functional as F
 
+
 class MetricsCalculator:
     def __init__(self, num_classes: int, class_names: List[str]):
         self.num_classes = num_classes
