@@ -39,6 +39,16 @@ class MetricsCalculator:
         return {name: metric(y_pred, y_true) for name, metric in self.metrics.items()}
 
     def generate_metrics_report(self, y_true: torch.Tensor, y_pred: torch.Tensor) -> str:
+        # Ensure y_pred has the correct shape (batch_size, num_classes)
+        if y_pred.dim() == 1:
+            y_pred = y_pred.unsqueeze(1)
+        if y_pred.dim() == 2 and y_pred.shape[1] == 1:
+            y_pred = torch.cat([1 - y_pred, y_pred], dim=1)
+        
+        # Ensure y_true has the correct shape (batch_size,)
+        if y_true.dim() == 2:
+            y_true = y_true.squeeze(1)
+        
         metrics_values = self.compute_metrics(y_true, y_pred)
 
         metrics_report = {}
