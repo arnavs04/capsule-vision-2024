@@ -5,7 +5,7 @@ from datetime import datetime
 
 from pathlib import Path
 from typing import Dict
-from logging import getLogger, INFO, StreamHandler, FileHandler, Formatter
+from logging import getLogger, Logger, INFO, StreamHandler, FileHandler, Formatter
 
 import numpy as np
 import pandas as pd
@@ -17,23 +17,26 @@ logging_dir = "../capsule-vision-2024/logs"
 logging_dir="kaggle/working/logs"
 
 
-def setup_logger(model_name: str) -> getLogger:
+def setup_logger(model_name: str) -> Logger:
     log_dir = os.path.join(logging_dir, model_name)
     os.makedirs(log_dir, exist_ok=True)
     log_file = os.path.join(log_dir, f"{datetime.now().strftime('%Y%m%d_%H%M%S')}.log")
 
     logger = getLogger(model_name)
-    logger.setLevel(INFO)
+    
+    # Only set up the logger if it hasn't been set up before
+    if not logger.handlers:
+        logger.setLevel(INFO)
 
-    file_handler = FileHandler(log_file)
-    stream_handler = StreamHandler()
+        file_handler = FileHandler(log_file)
+        stream_handler = StreamHandler()
 
-    formatter = Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    file_handler.setFormatter(formatter)
-    stream_handler.setFormatter(formatter)
+        formatter = Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        file_handler.setFormatter(formatter)
+        stream_handler.setFormatter(formatter)
 
-    logger.addHandler(file_handler)
-    logger.addHandler(stream_handler)
+        logger.addHandler(file_handler)
+        logger.addHandler(stream_handler)
 
     return logger
 
