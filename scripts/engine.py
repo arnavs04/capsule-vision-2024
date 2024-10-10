@@ -25,7 +25,7 @@ def train_step(model: nn.Module,
         optimizer.zero_grad(set_to_none=True)
 
         y_pred_logits = model(X)  # Get model logits
-        print(f"y_pred_logits shape after model: {y_pred_logits.shape}")  # Debug shape
+        # print(f"y_pred_logits shape after model: {y_pred_logits.shape}")  # Debug shape
         
         loss = loss_fn(y_pred_logits, y)
         loss.backward()
