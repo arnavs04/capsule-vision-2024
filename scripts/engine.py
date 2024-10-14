@@ -5,7 +5,7 @@ from torch.utils.data import DataLoader
 from typing import Dict, List, Tuple
 from tqdm import tqdm
 from utils import *
-from metrics import generate_metrics_report  # Make sure to import the function here
+from metrics import *  # Make sure to import the function here
 
 
 def train_step(model: nn.Module, 
@@ -204,4 +204,35 @@ def train(model: nn.Module,
     torch.cuda.empty_cache()
     torch.cuda.synchronize()
 
+    return results
+
+
+def train_single_model(model_name: str, 
+                       model: nn.Module, 
+                       train_dataloader: DataLoader, 
+                       test_dataloader: DataLoader, 
+                       epochs: int, 
+                       device: torch.device, 
+                       save_dir: str, 
+                       engine) -> dict:
+
+    # Move model to target device
+    model = model.to(device)
+
+    optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4, weight_decay=0.05)
+    loss_fn = FocalLoss()
+    
+    # Train the model using the engine's train function
+    results = engine.train(
+        model=model,
+        train_dataloader=train_dataloader,
+        test_dataloader=test_dataloader,
+        optimizer=optimizer,
+        loss_fn=loss_fn,
+        epochs=epochs,
+        device=device,
+        model_name=model_name,  # Model name for logging and saving
+        save_dir=save_dir,  # Directory to save models
+    )
+    
     return results
