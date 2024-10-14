@@ -73,7 +73,7 @@ def test_step(model: nn.Module,
             X, y = X.to(device), y.to(device)
 
             y_pred_logits = model(X)  # Get model logits
-            print(f"y_pred_logits shape after model: {y_pred_logits.shape}")  # Debug shape
+            # print(f"y_pred_logits shape after model: {y_pred_logits.shape}")  # Debug shape
             
             loss = loss_fn(y_pred_logits, y)
 
@@ -111,23 +111,31 @@ def train(model: nn.Module,
           epochs: int,
           device: torch.device,
           model_name: str,
-          save_dir: str) -> Dict[str, List]:
+          save_dir: str,
+          patience: int = 5,  # Number of epochs to wait for improvement before stopping
+          tolerance: float = 1e-4  # Minimum improvement to consider it a significant improvement
+          ) -> Dict[str, List]:
     
     results = {
         "train_loss": [],
         "train_acc": [],
         "test_loss": [],
-        "test_acc": []
+        "test_acc": [],
+        "mean_auc": []  # To store the mean AUC scores per epoch
     }
     
     model.to(device)
     scheduler = CosineAnnealingLR(optimizer, T_max=epochs)
     logger = setup_logger(model_name)
     logger.info(f"Training started for model: {model_name}")
+    
+    best_mean_auc = -float('inf')  # Initialize to a very low value
+    best_epoch = 0
+    no_improvement_count = 0  # Track the number of epochs without improvement
 
     for epoch in range(epochs):
         # Create a tqdm progress bar for each epoch
-        with tqdm(total=len(train_dataloader) + len(test_dataloader), desc=f"Epoch {epoch+1}/{epochs}") as epoch_progress:
+        with tqdm(desc=f"Epoch {epoch+1}/{epochs}", total=len(train_dataloader) + len(test_dataloader)) as epoch_progress:
             train_loss, train_acc, train_preds, train_labels = train_step(
                 model, train_dataloader, loss_fn, optimizer, device, epoch_progress
             )
@@ -156,10 +164,32 @@ def train(model: nn.Module,
             f"test_acc: {test_acc:.4f}"
         )
 
-        # Save model checkpoint
-        if (epoch + 1) % 5 == 0:
-            save_model(model, save_dir, f"{model_name}.pth")
-            logger.info(f"Model checkpoint saved at epoch {epoch+1}")
+        # Extract the mean AUC score from the test metrics
+        test_metrics_dict = json.loads(test_metrics)
+        current_mean_auc = test_metrics_dict['mean_auc']  # Mean AUC score for the current epoch
+
+        # Update results
+        results["train_loss"].append(train_loss)
+        results["train_acc"].append(train_acc)
+        results["test_loss"].append(test_loss)
+        results["test_acc"].append(test_acc)
+        results["mean_auc"].append(current_mean_auc)
+
+        # Early Stopping Logic
+        if current_mean_auc > best_mean_auc + tolerance:
+            best_mean_auc = current_mean_auc
+            best_epoch = epoch + 1
+            no_improvement_count = 0  # Reset the count since we have an improvement
+            save_model(model, save_dir, f"{model_name}_best.pth")
+            logger.info(f"Best model saved with mean AUC score: {best_mean_auc:.4f} at epoch {epoch+1}")
+        else:
+            no_improvement_count += 1
+            logger.info(f"No improvement for {no_improvement_count} consecutive epochs.")
+
+        # Stop training if no improvement for the last 'patience' epochs
+        if no_improvement_count >= patience:
+            logger.info(f"Early stopping at epoch {epoch+1} after {patience} epochs of no improvement.")
+            break
 
         # Save metrics report
         save_metrics_report({
@@ -168,13 +198,7 @@ def train(model: nn.Module,
             "test_metrics": test_metrics
         }, model_name, epoch)
 
-        # Update results
-        results["train_loss"].append(train_loss)
-        results["train_acc"].append(train_acc)
-        results["test_loss"].append(test_loss)
-        results["test_acc"].append(test_acc)
-
-    logger.info(f"Training completed for model: {model_name}")
+    logger.info(f"Training completed for model: {model_name}. Best model at epoch {best_epoch} with mean AUC: {best_mean_auc:.4f}")
 
     del model, optimizer
     torch.cuda.empty_cache()
