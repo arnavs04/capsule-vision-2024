@@ -1,9 +1,28 @@
 import torch
 import torchmetrics
+from torch import nn
+import torch.nn.functional as F
 import json
 from typing import List
-import torch.nn.functional as F
 
+
+class FocalLoss(nn.Module):
+    def __init__(self, alpha=1, gamma=2, reduction='mean'):
+        super(FocalLoss, self).__init__()
+        self.alpha = alpha
+        self.gamma = gamma
+        self.reduction = reduction
+
+    def forward(self, inputs, targets):
+        CE_loss = nn.CrossEntropyLoss(reduction='none')(inputs, targets)
+        p_t = torch.exp(-CE_loss)
+        loss = self.alpha * (1 - p_t) ** self.gamma * CE_loss
+
+        if self.reduction == 'mean':
+            return torch.mean(loss)
+        else:
+            return loss
+        
 
 class MetricsCalculator:
     def __init__(self, num_classes: int, class_names: List[str]):
@@ -99,3 +118,4 @@ def generate_metrics_report(y_true: torch.Tensor, y_pred: torch.Tensor) -> str:
 #         report_gpu = generate_metrics_report(y_true_gpu, y_pred_gpu)
 #         print("\nGPU Report:")
 #         print(report_gpu)
+

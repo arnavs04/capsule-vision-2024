@@ -22,6 +22,7 @@ from model_builder import (
     model_mobilenet_v2, 
 )
 from utils import *
+from metrics import *
 print("Libraries Imported Successfuly!\n\n")
 
 # Setup hyperparameters
@@ -103,7 +104,7 @@ for model_name, model in model_list.items():
     
     # Define optimizer (AdamW as an example) and loss function (Cross Entropy)
     optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4, weight_decay=0.05)
-    loss_fn = nn.CrossEntropyLoss()
+    loss_fn = FocalLoss() # CrossEntropyLoss()
     
     # Train the model using engine.train function
     results = engine.train(
