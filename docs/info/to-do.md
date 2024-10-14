@@ -1,17 +1,17 @@
 # To Do
 
-- Handling Class Imbalance
-- Dealing with Different Sources (Different Distributions)
+- Early Stopping, Saving Model with Better Techniques
+- Handling Class Imbalance [DONE]
 - Data Augmentation, Resize [DONE]
 
-## Imp. Details
+# Imp. Details
 - Evaluation Metrics (<u>Mean Auc</u>, F1 Score, ROC-AUC)
 - 10 Class Labels (Multi-Class Classification)
 
 ## Models
 *can be pre-trained, ensemble, and deep learning methods*
 - CNNs (ResNet18, InceptionNetResNetv2, MobileNetv2)
-- Vision Transformers (Swin, CSwin, BEiT/DeiT)
+- Vision Transformers (Swin, BEiT/DeiT)
 - Research Specific (Open up research papers to find transformers made exactly for specific tasks like this)
 
 ## Training Techniques
@@ -19,6 +19,8 @@
 - Iterative K-fold (4-5 Folds)
 - Self-Supervised Pre-training (Masked Auto-Encoding, Contrastive Learning)
 - Optimization Strategies (Cosine Learning Rate Schedule, Warmup, Layer-wise Learning Rate Decay, Early-stopping)
+
+# Others
 
 ## Dealing with Class Imbalances
 
