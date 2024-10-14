@@ -32,6 +32,9 @@ HIDDEN_UNITS = 32
 LEARNING_RATE = 0.003
 NUM_WORKERS = 4
 
+# Reproducibility
+seed_everything(seed=42)
+
 # Setup directories
 train_dir = "training"
 test_dir = "validation"
