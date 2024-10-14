@@ -1,6 +1,8 @@
 # To Do
 
 - Early Stopping, Saving Model with Better Techniques
+- Training
+- Inference (Ensembling)
 - Handling Class Imbalance [DONE]
 - Data Augmentation, Resize [DONE]
 
