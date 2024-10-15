@@ -1,8 +1,11 @@
 # To Do
 
-- Training
-- Inference (Ensembling)
-- Better
+- Better Performance
+- Rechecking Submission Format
+- Organize Repo with readme especially
+- Submission Report
+- Training [DONE]
+- Inference (Ensembling) [DONE]
 - Early Stopping, Saving Model with Better Techniques [DONE]
 - Handling Class Imbalance [DONE]
 - Data Augmentation, Resize [DONE]
