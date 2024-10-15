@@ -52,6 +52,18 @@ def save_model(model: nn.Module, target_dir: str, model_name: str):
     torch.save(obj=model.state_dict(), f=model_save_path)
 
 
+def load_model(model: nn.Module, target_dir: str, model_name: str):
+    assert model_name.endswith(".pth") or model_name.endswith(".pt"), "model_name should end with '.pt' or '.pth'"
+    target_dir_path = Path(target_dir)
+    
+    model_load_path = target_dir_path / model_name
+    assert model_load_path.is_file(), f"Model file not found at: {model_load_path}"
+    
+    print(f"[INFO] Loading model from: {model_load_path}")
+    model.load_state_dict(torch.load(model_load_path))
+    return model
+
+
 def save_metrics_report(report: Dict, model_name: str, epoch: int, save_dir: str = "../capsule-vision-2024/logs/reports"):
     report_dir = os.path.join(save_dir, model_name)
     os.makedirs(report_dir, exist_ok=True)  # Create the directory if it doesn't exist
