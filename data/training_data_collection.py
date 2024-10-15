@@ -40,6 +40,7 @@ def unzip_file(zip_path, extract_to):
 
 def main():
     url = 'https://figshare.com/ndownloader/files/48018562'
+    url = 'https://figshare.com/articles/dataset/Testing_Dataset_of_Capsule_Vision_2024_Challenge/27200664?file=49717386'
     download_path = '../capsule-vision-2024/data/downloaded_file.zip'
     data_path = '../capsule-vision-2024/data'
     

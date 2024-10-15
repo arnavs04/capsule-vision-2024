@@ -2,18 +2,17 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import classification_report, roc_auc_score
 import json
-from sklearn.metrics import classification_report, roc_auc_score, precision_recall_curve, auc, recall_score, f1_score
-
+from sklearn.metrics import classification_report, roc_auc_score, precision_recall_curve, auc, recall_score, f1_score, balanced_accuracy_score
 
 def save_predictions_to_excel(image_paths, y_pred, output_path):
     class_columns = ['Angioectasia', 'Bleeding', 'Erosion', 'Erythema', 'Foreign Body', 'Lymphangiectasia', 'Normal', 'Polyp', 'Ulcer', 'Worms']
     y_pred_classes = np.argmax(y_pred, axis=1)
-    df = pd.DataFrame({
-        'image_path': image_paths,
-        'predicted_class': [class_columns[i] for i in y_pred_classes],
-        **{col: y_pred[:, i] for i, col in enumerate(class_columns)}
-    })
-    df.to_excel(output_path, index=False)
+    predicted_class_names = [class_columns[i] for i in y_pred_classes]
+    df_prob = pd.DataFrame(y_pred, columns=class_columns)
+    df_prob.insert(0, 'image_path', image_paths)
+    df_class = pd.DataFrame({'image_path': image_paths, 'predicted_class': predicted_class_names})
+    df_merged = pd.merge(df_prob, df_class, on='image_path')
+    df_merged.to_excel(output_path, index=False)
 
 
 def calculate_specificity(y_true, y_pred):
@@ -36,7 +35,7 @@ def generate_metrics_report(y_true, y_pred):
         try:
             auc_roc_scores[class_name] = roc_auc_score(y_true[:, i], y_pred[:, i])
         except ValueError:
-            auc_roc_scores[class_name] = 0.0  # Handle case where AUC cannot be computed
+            auc_roc_scores[class_name] = 0.0  
     
     mean_auc_roc = np.mean(list(auc_roc_scores.values()))
     auc_roc_scores['mean_auc'] = mean_auc_roc
@@ -54,7 +53,7 @@ def generate_metrics_report(y_true, y_pred):
             precision, recall, _ = precision_recall_curve(y_true[:, i], y_pred[:, i])
             average_precision_scores[class_name] = auc(recall, precision)
         except ValueError:
-            average_precision_scores[class_name] = 0.0  # Handle case where PR curve cannot be computed
+            average_precision_scores[class_name] = 0.0  
     
     mean_average_precision = np.mean(list(average_precision_scores.values()))
     average_precision_scores['mean_average_precision'] = mean_average_precision
@@ -64,7 +63,7 @@ def generate_metrics_report(y_true, y_pred):
         try:
             sensitivity_scores[class_name] = recall_score(y_true[:, i], (y_pred[:, i] >= 0.5).astype(int), zero_division=0)
         except ValueError:
-            sensitivity_scores[class_name] = 0.0  # Handle case where recall cannot be computed
+            sensitivity_scores[class_name] = 0.0  
     
     mean_sensitivity = np.mean(list(sensitivity_scores.values()))
     sensitivity_scores['mean_sensitivity'] = mean_sensitivity
@@ -74,11 +73,12 @@ def generate_metrics_report(y_true, y_pred):
         try:
             f1_scores[class_name] = f1_score(y_true[:, i], (y_pred[:, i] >= 0.5).astype(int), zero_division=0)
         except ValueError:
-            f1_scores[class_name] = 0.0  # Handle case where F1 score cannot be computed
+            f1_scores[class_name] = 0.0  
     
     mean_f1_score = np.mean(list(f1_scores.values()))
     f1_scores['mean_f1_score'] = mean_f1_score
-    
+    balanced_accuracy_scores = balanced_accuracy_score(y_true_classes, y_pred_classes)
+
     metrics_report.update(class_report)
     metrics_report['auc_roc_scores'] = auc_roc_scores
     metrics_report['specificity_scores'] = specificity_scores
@@ -90,9 +90,9 @@ def generate_metrics_report(y_true, y_pred):
     metrics_report['mean_average_precision'] = mean_average_precision
     metrics_report['mean_sensitivity'] = mean_sensitivity
     metrics_report['mean_f1_score'] = mean_f1_score
+    metrics_report['balanced_accuracy'] = balanced_accuracy_scores
     
     metrics_report_json = json.dumps(metrics_report, indent=4)
     return metrics_report_json
-
 
 

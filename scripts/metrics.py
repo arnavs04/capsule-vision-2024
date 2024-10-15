@@ -22,7 +22,7 @@ class FocalLoss(nn.Module):
             return torch.mean(loss)
         else:
             return loss
-        
+
 
 class MetricsCalculator:
     def __init__(self, num_classes: int, class_names: List[str]):
@@ -53,9 +53,9 @@ class MetricsCalculator:
         if self.metrics is None or next(iter(self.metrics.values())).device != device:
             self._initialize_metrics(device)
 
-        # Ensure y_pred has shape [batch_size, num_classes] (logits or probabilities)
-        if y_pred.dim() == 1:  # If y_pred is 1D, we need to raise an error
-            raise ValueError(f"y_pred must have shape [batch_size, num_classes], but got {y_pred.shape}.")
+        # Apply softmax if needed (for AUROC, AUPRC, and other probability-based metrics)
+        if y_pred.dim() == 2:  # Logits (for multi-class)
+            y_pred = torch.softmax(y_pred, dim=1)  # Apply softmax to get probabilities
 
         # Ensure y_true is a long tensor with shape [batch_size]
         y_true = y_true.long()
@@ -65,12 +65,12 @@ class MetricsCalculator:
         # Calculate and return metrics
         return {name: metric(y_pred, y_true) for name, metric in self.metrics.items()}
 
-
     def generate_metrics_report(self, y_true: torch.Tensor, y_pred: torch.Tensor) -> str:
         metrics_values = self.compute_metrics(y_true, y_pred)
 
         metrics_report = {}
 
+        # Class-wise metrics
         for i, class_name in enumerate(self.class_names):
             metrics_report[class_name] = {
                 'precision': self.to_cpu(metrics_values['precision'][i]),
@@ -79,6 +79,7 @@ class MetricsCalculator:
                 'specificity': self.to_cpu(metrics_values['specificity'][i])
             }
 
+        # Mean (macro avg) calculations
         metrics_report['accuracy'] = self.to_cpu(metrics_values['accuracy'])
         metrics_report['macro avg'] = {
             'precision': self.to_cpu(metrics_values['precision'].mean()),
@@ -86,27 +87,37 @@ class MetricsCalculator:
             'f1-score': self.to_cpu(metrics_values['f1_score'].mean()),
             'specificity': self.to_cpu(metrics_values['specificity'].mean())
         }
+
+        # AUROC per class and mean
         metrics_report['auc_roc_scores'] = {class_name: self.to_cpu(score) for class_name, score in zip(self.class_names, metrics_values['auroc'])}
-        metrics_report['average_precision_scores'] = {class_name: self.to_cpu(score) for class_name, score in zip(self.class_names, metrics_values['auprc'])}
         metrics_report['mean_auc'] = self.to_cpu(metrics_values['auroc'].mean())
+
+        # Average precision per class and mean
+        metrics_report['average_precision_scores'] = {class_name: self.to_cpu(score) for class_name, score in zip(self.class_names, metrics_values['auprc'])}
         metrics_report['mean_average_precision'] = self.to_cpu(metrics_values['auprc'].mean())
 
+        # Mean values for additional metrics (F1, Specificity, Sensitivity)
+        metrics_report['mean_f1_score'] = self.to_cpu(metrics_values['f1_score'].mean())
+        metrics_report['mean_specificity'] = self.to_cpu(metrics_values['specificity'].mean())
+        metrics_report['mean_sensitivity'] = self.to_cpu(metrics_values['recall'].mean())  # Sensitivity is equivalent to recall
+
         return json.dumps(metrics_report, indent=4)
+
 
 def generate_metrics_report(y_true: torch.Tensor, y_pred: torch.Tensor) -> str:
     class_columns = ['Angioectasia', 'Bleeding', 'Erosion', 'Erythema', 'Foreign Body', 'Lymphangiectasia', 'Normal', 'Polyp', 'Ulcer', 'Worms']
     calculator = MetricsCalculator(num_classes=len(class_columns), class_names=class_columns)
     return calculator.generate_metrics_report(y_true, y_pred)
 
-# # Example usage
+
+# Example usage (uncomment to run):
 # if __name__ == "__main__":
-#     # Simulating some dummy data
 #     num_samples = 100
 #     num_classes = 10
 #     y_true = torch.randint(0, num_classes, (num_samples,))
 #     y_pred = torch.randn(num_samples, num_classes)
     
-#     # Test on CPU
+#     # CPU Test
 #     report_cpu = generate_metrics_report(y_true, y_pred)
 #     print("CPU Report:")
 #     print(report_cpu)
@@ -118,4 +129,3 @@ def generate_metrics_report(y_true: torch.Tensor, y_pred: torch.Tensor) -> str:
 #         report_gpu = generate_metrics_report(y_true_gpu, y_pred_gpu)
 #         print("\nGPU Report:")
 #         print(report_gpu)
-

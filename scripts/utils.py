@@ -89,10 +89,6 @@ def save_predictions_to_excel(image_paths, y_pred: torch.Tensor, output_path: st
     df.to_excel(output_path, index=False)
 
 
-def is_torch_available():
-    return torch is not None
-
-
 def seed_everything(seed=42):
     random.seed(seed)
     os.environ['PYTHONHASHSEED'] = str(seed)
@@ -100,14 +96,3 @@ def seed_everything(seed=42):
     torch.manual_seed(seed)
     torch.cuda.manual_seed(seed)
     torch.backends.cudnn.deterministic = True
-
-
-def count_parameters(model: nn.Module):
-    return sum(p.numel() for p in model.parameters() if p.requires_grad)
-
-
-def model_size_mb(model: nn.Module):
-    total_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
-    size_in_bytes = total_params * 4
-    size_in_mb = size_in_bytes / (1024 ** 2)
-    return size_in_mb

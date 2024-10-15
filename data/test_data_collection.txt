@@ -1,0 +1,5 @@
+Please download the Test Set from:
+https://figshare.com/articles/dataset/Testing_Dataset_of_Capsule_Vision_2024_Challenge/27200664?file=49717386
+
+Make sure it is unzipped and put in this directory itself such that the path is like
+"../capsule-vision-2024/data/Testing set/Images"

@@ -1,12 +1,11 @@
 import torch
-from torch import nn
-from torch.utils.data import DataLoader
 from torchvision import transforms
-from torchvision.datasets import ImageFolder
-from tqdm import tqdm
+import pandas as pd
 import os
-import json
-from metrics import generate_metrics_report  # Assuming this is your metrics reporting function
+from tqdm import tqdm
+import numpy as np
+from torch.utils.data import DataLoader, Dataset
+from PIL import Image
 
 from model_builder import (
     model_resnet18,
@@ -15,85 +14,120 @@ from model_builder import (
     model_mobilenet_v2,
     model_swin,
 )
+from utils import save_predictions_to_excel  # Keep the same save function
 
-## INCOMPLETE
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+# Model paths
 
+# model_paths = [
+#     '../capsule-vision-2024/models/ResNet18_best.pth',
+#     '../capsule-vision-2024/models/BEiT_best.pth',
+#     '../capsule-vision-2024/models/InceptionResNetV2_best.pth',
+#     '../capsule-vision-2024/models/MobileNetV2_best.pth',
+#     '../capsule-vision-2024/models/SwinTransformer_best.pth'
+# ]
+
+model_paths = [
+    '/kaggle/input/capsule-vision-2024-models/pytorch/default/1/ResNet18_best.pth',
+    '/kaggle/input/capsule-vision-2024-models/pytorch/default/1/BEiT_best.pth',
+    '/kaggle/input/capsule-vision-2024-models/pytorch/default/1/InceptionResNetV2_best.pth',
+    '/kaggle/input/capsule-vision-2024-models/pytorch/default/1/MobileNetV2_best.pth',
+    '/kaggle/input/capsule-vision-2024-models/pytorch/default/1/SwinTransformer_best.pth'
+]
+
+# Model classes
+model_classes = [model_resnet18, model_beit, model_inception_resnet_v2, model_mobilenet_v2, model_swin]
+
+# Function to load PyTorch model
 def load_model(model_class, model_path, device):
-    """Load the trained model from a specified path."""
-    model = model_class()  # Replace with your model initialization
+    model = model_class()
     model.load_state_dict(torch.load(model_path, map_location=device))
     model.eval()
     model.to(device)
     return model
 
-
-def preprocess_data(data_dir):
-    """Preprocess the VCE dataset for inference."""
+# Preprocess the image as per PyTorch model requirements
+def load_and_preprocess_image(full_path, target_size=(224, 224)):
+    img = Image.open(full_path).convert('RGB')
     transform = transforms.Compose([
-        transforms.Resize((224, 224)),  # Adjust size according to your model input
+        transforms.Resize(target_size),
         transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])  # Adjust based on your dataset
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     ])
-    dataset = ImageFolder(root=data_dir, transform=transform)
-    dataloader = DataLoader(dataset, batch_size=32, shuffle=False)  # Adjust batch size as necessary
-    return dataloader, dataset.class_to_idx
+    return transform(img)
 
+# Custom Dataset for loading test data
+class TestDataset(Dataset):
+    def __init__(self, image_paths, image_size=(224, 224)):
+        self.image_paths = image_paths
+        self.image_size = image_size
 
-def run_inference(model, dataloader, device):
-    """Run inference on the dataset and collect predictions and true labels."""
+    def __len__(self):
+        return len(self.image_paths)
+
+    def __getitem__(self, idx):
+        image_path = self.image_paths[idx]
+        img = load_and_preprocess_image(image_path, self.image_size)
+        return img, image_path
+
+# Function to load test data
+def load_test_data(test_dir, image_size=(224, 224)):
+    image_paths = [os.path.join(test_dir, fname) for fname in os.listdir(test_dir) if fname.lower().endswith(('jpg'))]
+    dataset = TestDataset(image_paths, image_size)
+    dataloader = DataLoader(dataset, batch_size=32, shuffle=False, num_workers=4)
+    return dataloader, image_paths
+
+# Ensemble Inference on the test set
+def ensemble_test_inference(models, dataloader, device):
     all_predictions = []
-    all_labels = []
+    all_image_paths = []
 
     with torch.no_grad():
-        for X, y in tqdm(dataloader, desc="Running Inference"):
+        for X, image_paths in tqdm(dataloader, total=len(dataloader), desc="Ensemble Test Inference"):
             X = X.to(device)
-            y_pred_logits = model(X)  # Get model logits
 
-            # Apply softmax to get probabilities
-            y_pred_probs = torch.softmax(y_pred_logits, dim=1)
+            # Initialize ensemble predictions
+            ensemble_preds = None
 
-            # Collect predictions and true labels
-            all_predictions.append(y_pred_probs)
-            all_labels.append(y)
+            # Accumulate predictions from each model
+            for model in models:
+                model.eval()
+                y_pred_logits = model(X)
+                y_pred_probs = torch.softmax(y_pred_logits, dim=1)  # Convert logits to probabilities
 
-    # Concatenate results
+                if ensemble_preds is None:
+                    ensemble_preds = y_pred_probs
+                else:
+                    ensemble_preds += y_pred_probs
+
+            # Average predictions over all models
+            ensemble_preds /= len(models)
+
+            all_predictions.append(ensemble_preds.cpu())  # Collect predictions
+            all_image_paths.extend(image_paths)  # Collect image paths
+
     predictions = torch.cat(all_predictions, dim=0)
-    labels = torch.cat(all_labels, dim=0)
-    
-    return labels, predictions
+    return predictions, all_image_paths
 
+def main():
+    # Load ensemble models
+    models = [load_model(cls, path, device) for cls, path in zip(model_classes, model_paths)]
 
-def main(data_dir, model_path):
-    """Main function to run inference."""
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    # Directory containing test images
+    # test_path = "../capsule-vision-2024/data/Testing set/Images"
+    test_path = "/kaggle/input/capsule-vision-2020-test/Testing set/Images"  # Update with actual path
+    dataloader, image_paths = load_test_data(test_path)
 
-    # Load the model
-    model = load_model(model_class=model, model_path=model_path, device=device)
+    # Run ensemble inference on the test set
+    predictions, image_paths = ensemble_test_inference(models, dataloader, device)
 
-    # Preprocess the data
-    dataloader, class_names = preprocess_data(data_dir)
+    # Save predictions to Excel
+    # output_test_predictions = "../capsule-vision-2024/submission/test_excel.xlsx"
+    output_test_predictions = "/kaggle/working/test_excel.xlsx"
+    save_predictions_to_excel(image_paths, predictions, output_test_predictions)
 
-    # Run inference
-    true_labels, predictions = run_inference(model, dataloader, device)
-
-    # Generate metrics report
-    metrics_report = generate_metrics_report(true_labels, predictions)
-    print("Metrics Report:\n", metrics_report)
-
-    # Save the predictions to a file
-    predictions_numpy = predictions.cpu().numpy()  # Move to CPU and convert to NumPy
-    predictions_dict = {
-        "predictions": predictions_numpy.tolist(),  # Convert to list for JSON serialization
-        "true_labels": true_labels.cpu().numpy().tolist()  # True labels
-    }
-    
-    with open('predictions.json', 'w') as f:
-        json.dump(predictions_dict, f)
-
-    print("Inference completed. Predictions saved to predictions.json.")
+    print(f"Predictions saved to {output_test_predictions}")
 
 if __name__ == "__main__":
-    DATA_DIR = 'path/to/your/vce/dataset'  # Replace with your VCE dataset path
-    MODEL_PATH = 'path/to/your/model.pth'  # Replace with your model path
-    main(DATA_DIR, MODEL_PATH)
+    main()
