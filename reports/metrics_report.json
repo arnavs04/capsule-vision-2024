@@ -59,13 +59,13 @@
         "f1-score": 0.9444444179534912,
         "specificity": 0.9995020031929016
     },
-    "accuracy": 0.9360277652740479,
     "macro avg": {
         "precision": 0.8426171541213989,
         "recall": 0.8381171226501465,
         "f1-score": 0.8390803337097168,
         "specificity": 0.9876536130905151
     },
+    "accuracy": 0.9360277652740479,
     "auc_roc_scores": {
         "Angioectasia": 0.9872181415557861,
         "Bleeding": 0.9900286793708801,
@@ -94,5 +94,6 @@
     "mean_average_precision": 0.8933927416801453,
     "mean_f1_score": 0.8390803337097168,
     "mean_specificity": 0.9876536130905151,
-    "mean_sensitivity": 0.8381171226501465
+    "mean_sensitivity": 0.8381171226501465,
+    "balanced_accuracy": 0.8381171226501465
 }

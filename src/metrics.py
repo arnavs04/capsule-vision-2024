@@ -1,7 +1,6 @@
 import torch
 import torchmetrics
 from torch import nn
-import torch.nn.functional as F
 import json
 from typing import List
 
@@ -53,17 +52,34 @@ class MetricsCalculator:
         if self.metrics is None or next(iter(self.metrics.values())).device != device:
             self._initialize_metrics(device)
 
-        # Apply softmax if needed (for AUROC, AUPRC, and other probability-based metrics)
-        if y_pred.dim() == 2:  # Logits (for multi-class)
-            y_pred = torch.softmax(y_pred, dim=1)  # Apply softmax to get probabilities
+        # For AUROC, Average Precision, and probability-based metrics, use raw logits.
+        y_pred_softmax = torch.softmax(y_pred, dim=1)
+
+        # For class-prediction-based metrics (Accuracy, Precision, Recall), use argmax of logits.
+        y_pred_classes = torch.argmax(y_pred, dim=1)
 
         # Ensure y_true is a long tensor with shape [batch_size]
         y_true = y_true.long()
         if y_true.dim() == 2:
             y_true = y_true.squeeze(1)
 
-        # Calculate and return metrics
-        return {name: metric(y_pred, y_true) for name, metric in self.metrics.items()}
+        # Compute the metrics (class-prediction metrics on argmax, probability-based on softmax)
+        metrics_values = {
+            'confusion_matrix': self.metrics['confusion_matrix'](y_pred_classes, y_true),
+            'accuracy': self.metrics['accuracy'](y_pred_classes, y_true),
+            'precision': self.metrics['precision'](y_pred_classes, y_true),
+            'recall': self.metrics['recall'](y_pred_classes, y_true),
+            'f1_score': self.metrics['f1_score'](y_pred_classes, y_true),
+            'specificity': self.metrics['specificity'](y_pred_classes, y_true),
+            'auroc': self.metrics['auroc'](y_pred_softmax, y_true),
+            'auprc': self.metrics['auprc'](y_pred_softmax, y_true),
+        }
+
+        # Balanced accuracy manually using recall
+        balanced_accuracy = metrics_values['recall'].mean()  # Mean recall across all classes
+        metrics_values['balanced_accuracy'] = balanced_accuracy
+
+        return metrics_values
 
     def generate_metrics_report(self, y_true: torch.Tensor, y_pred: torch.Tensor) -> str:
         metrics_values = self.compute_metrics(y_true, y_pred)
@@ -79,8 +95,7 @@ class MetricsCalculator:
                 'specificity': self.to_cpu(metrics_values['specificity'][i])
             }
 
-        # Mean (macro avg) calculations
-        metrics_report['accuracy'] = self.to_cpu(metrics_values['accuracy'])
+        # Macro (mean) averages for class-wise metrics
         metrics_report['macro avg'] = {
             'precision': self.to_cpu(metrics_values['precision'].mean()),
             'recall': self.to_cpu(metrics_values['recall'].mean()),
@@ -88,18 +103,24 @@ class MetricsCalculator:
             'specificity': self.to_cpu(metrics_values['specificity'].mean())
         }
 
+        # Overall accuracy
+        metrics_report['accuracy'] = self.to_cpu(metrics_values['accuracy'])
+
         # AUROC per class and mean
         metrics_report['auc_roc_scores'] = {class_name: self.to_cpu(score) for class_name, score in zip(self.class_names, metrics_values['auroc'])}
         metrics_report['mean_auc'] = self.to_cpu(metrics_values['auroc'].mean())
 
-        # Average precision per class and mean
+        # Average precision (AUPRC) per class and mean
         metrics_report['average_precision_scores'] = {class_name: self.to_cpu(score) for class_name, score in zip(self.class_names, metrics_values['auprc'])}
         metrics_report['mean_average_precision'] = self.to_cpu(metrics_values['auprc'].mean())
 
-        # Mean values for additional metrics (F1, Specificity, Sensitivity)
+        # Mean values for F1, Specificity, Sensitivity
         metrics_report['mean_f1_score'] = self.to_cpu(metrics_values['f1_score'].mean())
         metrics_report['mean_specificity'] = self.to_cpu(metrics_values['specificity'].mean())
         metrics_report['mean_sensitivity'] = self.to_cpu(metrics_values['recall'].mean())  # Sensitivity is equivalent to recall
+
+        # Balanced accuracy
+        metrics_report['balanced_accuracy'] = self.to_cpu(metrics_values['balanced_accuracy'])
 
         return json.dumps(metrics_report, indent=4)
 
