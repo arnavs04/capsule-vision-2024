@@ -8,17 +8,31 @@ from typing import List
 class FocalLoss(nn.Module):
     def __init__(self, alpha=1, gamma=2, reduction='mean'):
         super(FocalLoss, self).__init__()
-        self.alpha = alpha
+        if isinstance(alpha, (float, int)):
+            self.alpha = torch.tensor(alpha)  
+        else:
+            self.alpha = alpha 
         self.gamma = gamma
         self.reduction = reduction
 
     def forward(self, inputs, targets):
         CE_loss = nn.CrossEntropyLoss(reduction='none')(inputs, targets)
         p_t = torch.exp(-CE_loss)
-        loss = self.alpha * (1 - p_t) ** self.gamma * CE_loss
+        
+        if self.alpha.device != inputs.device: 
+            self.alpha = self.alpha.to(inputs.device)
+        
+        if self.alpha.numel() > 1: 
+            alpha_t = self.alpha[targets]
+        else:
+            alpha_t = self.alpha
 
+        loss = alpha_t * (1 - p_t) ** self.gamma * CE_loss
+        
         if self.reduction == 'mean':
             return torch.mean(loss)
+        elif self.reduction == 'sum':
+            return torch.sum(loss)
         else:
             return loss
 

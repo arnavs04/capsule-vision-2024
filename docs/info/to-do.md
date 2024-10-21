@@ -1,6 +1,9 @@
 # To Do
 
 - Better Performance
+  - New 19 Models
+  - Training on Basis of Balanced Accuracy and MeanAUC Score
+  - 
 - Rechecking Submission Format
 - Organize Repo with readme especially
 - Submission Report

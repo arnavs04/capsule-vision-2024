@@ -14,13 +14,7 @@ from torchvision import transforms
 
 # Script Imports
 import data_setup, engine
-from model_builder import (
-    model_beit, 
-    model_swin, 
-    model_inception_resnet_v2,
-    model_resnet18,
-    model_mobilenet_v2, 
-)
+from model_builder import *
 from utils import *
 from metrics import *
 print("Libraries Imported Successfuly!\n\n")
@@ -31,6 +25,7 @@ BATCH_SIZE = 32
 HIDDEN_UNITS = 32
 LEARNING_RATE = 0.003
 NUM_WORKERS = 4
+KAGGLE = True
 
 # Reproducibility
 seed_everything(seed=42)
@@ -41,12 +36,14 @@ test_dir = "validation"
 train_xlsx_filename = "training_data.xlsx"
 test_xlsx_filename = "validation_data.xlsx"
 
-# data_dir = "../capsule-vision-2024/data/Dataset"
-data_dir="kaggle/input/capsule-vision-2024-data/Dataset"
-# save_dir = "../capsule-vision-2024/models"
-save_dir="kaggle/working/models"
-# logging_dir = "../capsule-vision-2024/logs"
-logging_dir="kaggle/working/logs"
+data_dir = "../capsule-vision-2024/data/Dataset"
+save_dir = "../capsule-vision-2024/models"
+logging_dir = "../capsule-vision-2024/logs"
+
+if KAGGLE is True:
+    data_dir="kaggle/input/capsule-vision-2024-data/Dataset"
+    save_dir="kaggle/working/models"
+    logging_dir="kaggle/working/logs"
 
 # Setup target device
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -83,15 +80,33 @@ print("Data Loaded!\n\n")
 
 # Class labels (assuming these are your target classes)
 class_columns = ['Angioectasia', 'Bleeding', 'Erosion', 'Erythema', 'Foreign Body', 'Lymphangiectasia', 'Normal', 'Polyp', 'Ulcer', 'Worms']
+num_classes = len(class_columns)
 
 # Define a list of models for training
 model_list = {
-    "ResNet18": model_resnet18(pretrained=True, num_classes=len(class_columns)),
-    "InceptionResNetV2": model_inception_resnet_v2(pretrained=True, num_classes=len(class_columns)),
-    "MobileNetV2": model_mobilenet_v2(pretrained=True, num_classes=len(class_columns)),
-    "Swin Transformer": model_swin(pretrained=True, num_classes=len(class_columns)),
-    "BEiT": model_beit(pretrained=True, num_classes=len(class_columns))
+    # CNN-based models
+    "EfficientNet": model_efficientnet(pretrained=True, num_classes=num_classes),
+    "ResNet": model_resnet(pretrained=True, num_classes=num_classes),
+    "MobileNetV3": model_mobilenetv3(pretrained=True, num_classes=num_classes),
+    "RegNet": model_regnet(pretrained=True, num_classes=num_classes),
+    "DenseNet": model_densenet(pretrained=True, num_classes=num_classes),
+    "InceptionV4": model_inception_v3(pretrained=True, num_classes=num_classes),
+    "ResNeXt": model_resnext(pretrained=True, num_classes=num_classes),
+    "WideResNet": model_wide_resnet(pretrained=True, num_classes=num_classes),
+    "MNASNet": model_mnasnet(pretrained=True, num_classes=num_classes),
+    "SEResNet50": model_seresnet50(pretrained=True, num_classes=num_classes),
+    "ConvNeXt": model_convnext(pretrained=True, num_classes=num_classes),
+
+    # Transformer-based models
+    "ViT": model_vit(pretrained=True, num_classes=num_classes),
+    "SwinTransformer": model_swin(pretrained=True, num_classes=num_classes),
+    "DeiT": model_deit(pretrained=True, num_classes=num_classes),
+    "BEiT": model_beit(pretrained=True, num_classes=num_classes),
+    "CaiT": model_cait(pretrained=True, num_classes=num_classes),
+    "TwinsSVT": model_twins_svt(pretrained=True, num_classes=num_classes),
+    "EfficientFormer": model_efficientformer(pretrained=True, num_classes=num_classes),
 }
+
 print("Models Loaded!\n\n")
 
 

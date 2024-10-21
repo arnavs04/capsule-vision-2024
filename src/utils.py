@@ -13,8 +13,14 @@ import pandas as pd
 import torch
 from torch import nn
 
+KAGGLE = True
+
 logging_dir = "../capsule-vision-2024/logs"
-logging_dir="kaggle/working/logs"
+save_report_dir = "../capsule-vision-2024/reports"
+
+if KAGGLE is True:
+    logging_dir = "kaggle/working/logs"
+    save_report_dir = "kaggle/working/reports"
 
 
 def setup_logger(model_name: str) -> Logger:
@@ -64,7 +70,7 @@ def load_model(model: nn.Module, target_dir: str, model_name: str):
     return model
 
 
-def save_metrics_report(report: Dict, model_name: str, epoch: int, save_dir: str = "../capsule-vision-2024/logs/reports"):
+def save_metrics_report(report: Dict, model_name: str, epoch: int, save_dir: str = save_report_dir):
     report_dir = os.path.join(save_dir, model_name)
     os.makedirs(report_dir, exist_ok=True)  # Create the directory if it doesn't exist
 
