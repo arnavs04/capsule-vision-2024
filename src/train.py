@@ -22,8 +22,7 @@ print("Libraries Imported Successfuly!\n\n")
 # Setup hyperparameters
 NUM_EPOCHS = 20
 BATCH_SIZE = 32
-HIDDEN_UNITS = 32
-LEARNING_RATE = 0.003
+LEARNING_RATE = 1e-4
 NUM_WORKERS = 4
 KAGGLE = True
 
