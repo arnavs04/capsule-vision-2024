@@ -37,6 +37,7 @@ capsule-vision-2024/
 │   ├── metrics_report.json          # Report detailing the model's evaluation metrics
 │   ├── validation_excel.xlsx        # Validation results in Excel format
 │   └── Seq2Cure.xlsx                # Final submission in Excel format
+├── .gitignore                       # Model Files (*.pth) to be ignored
 ├── LICENSE                          # License file for the repository
 ├── README.md                        # Project overview (this file)
 └── requirements.txt                 # List of dependencies
