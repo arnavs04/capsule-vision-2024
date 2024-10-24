@@ -57,7 +57,7 @@ capsule-vision-2024/
 
 The project implements a multi-model ensemble approach for video capsule endoscopy frame classification, utilizing three main components:
 
-*For more specific details check the [submission report](submission/)*
+*For more specific details check the [submission report](submission/submission_report.pdf)*
 
 ### Model Architecture
 The ensemble incorporates implementations of established CNN and transformer architectures:
