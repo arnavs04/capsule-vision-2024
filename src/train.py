@@ -10,45 +10,47 @@ from torch.utils.data import Dataset, DataLoader
 from torch.nn import functional as F
 
 import torchvision
-from torchvision import transforms 
+from torchvision import transforms
 
 # Script Imports
 import data_setup, engine
 from model_builder import *
 from utils import *
 from metrics import *
-print("Libraries Imported Successfuly!\n\n")
+print("Libraries Imported Successfully!\n\n")
 
-# Setup hyperparameters
+# Hyperparameters setup
 NUM_EPOCHS = 20
 BATCH_SIZE = 32
 LEARNING_RATE = 1e-4
 NUM_WORKERS = 4
-KAGGLE = True
+KAGGLE = True  # Set to True when running on Kaggle
 
-# Reproducibility
+# Reproducibility for consistent results
 seed_everything(seed=42)
 
-# Setup directories
+# Directory setup
 train_dir = "training"
 test_dir = "validation"
 train_xlsx_filename = "training_data.xlsx"
 test_xlsx_filename = "validation_data.xlsx"
 
+# Local directories
 data_dir = "../capsule-vision-2024/data/Dataset"
 save_dir = "../capsule-vision-2024/models"
 logging_dir = "../capsule-vision-2024/logs"
 
-if KAGGLE is True:
-    data_dir="kaggle/input/capsule-vision-2024-data/Dataset"
-    save_dir="kaggle/working/models"
-    logging_dir="kaggle/working/logs"
+# Kaggle-specific directories (if KAGGLE = True)
+if KAGGLE:
+    data_dir = "kaggle/input/capsule-vision-2024-data/Dataset"
+    save_dir = "kaggle/working/models"
+    logging_dir = "kaggle/working/logs"
 
-# Setup target device
+# Setup device (GPU if available, else CPU)
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"Device: {device}\n\n")
 
-
+# Data augmentation and normalization for training
 data_transform = transforms.Compose([
     transforms.Resize((224, 224)),
     transforms.RandomHorizontalFlip(p=0.5),
@@ -57,7 +59,7 @@ data_transform = transforms.Compose([
     transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1),
     transforms.RandomAffine(degrees=0, translate=(0.1, 0.1), scale=(0.9, 1.1)),
     transforms.RandomPerspective(distortion_scale=0.2, p=0.5),
-    transforms.ToTensor(),  # Convert the image to a tensor here
+    transforms.ToTensor(),
     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
     transforms.RandomErasing(p=0.2, scale=(0.02, 0.33), ratio=(0.3, 3.3), value='random'),
     transforms.RandomApply([transforms.GaussianBlur(kernel_size=3)], p=0.3)
@@ -76,9 +78,11 @@ train_loader, test_loader = data_setup.create_dataloaders(
 )
 print("Data Loaded!\n\n")
 
-
 # Class labels (assuming these are your target classes)
-class_columns = ['Angioectasia', 'Bleeding', 'Erosion', 'Erythema', 'Foreign Body', 'Lymphangiectasia', 'Normal', 'Polyp', 'Ulcer', 'Worms']
+class_columns = [
+    'Angioectasia', 'Bleeding', 'Erosion', 'Erythema', 'Foreign Body',
+    'Lymphangiectasia', 'Normal', 'Polyp', 'Ulcer', 'Worms'
+]
 num_classes = len(class_columns)
 
 # Define a list of models for training
@@ -108,7 +112,6 @@ model_list = {
 
 print("Models Loaded!\n\n")
 
-
 # Dictionary to store results for each model
 results_dict = {}
 
@@ -116,12 +119,12 @@ results_dict = {}
 for model_name, model in model_list.items():
     print(f"\nTraining model: {model_name}")
     
-    # Move model to target device
+    # Move model to target device (GPU/CPU)
     model = model.to(device)
     
-    # Define optimizer (AdamW as an example) and loss function (Cross Entropy)
-    optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4, weight_decay=0.05)
-    loss_fn = FocalLoss() # CrossEntropyLoss()
+    # Define optimizer (AdamW as an example) and loss function (FocalLoss)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=LEARNING_RATE, weight_decay=0.05)
+    loss_fn = FocalLoss()  # Optionally switch to CrossEntropyLoss if needed
     
     # Train the model using engine.train function
     results = engine.train(
@@ -132,12 +135,12 @@ for model_name, model in model_list.items():
         loss_fn=loss_fn,
         epochs=NUM_EPOCHS,
         device=device,
-        model_name=model_name,  # Model name to pass into logger and model saving
-        save_dir=save_dir,  # Directory to save models after every 5 epochs
+        model_name=model_name,  # Model name for logging and saving
+        save_dir=save_dir,  # Directory to save models every 5 epochs
     )
     
-    # Store the results
+    # Store training results
     results_dict[model_name] = results
 
-# After the training loop, results_dict will contain training history for each model
+# After the loop, results_dict contains the training history for all models
 print("Training complete for all models.")
