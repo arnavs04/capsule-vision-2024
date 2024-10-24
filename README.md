@@ -22,7 +22,6 @@ capsule-vision-2024/
 ├── /misc
 │   ├── /baseline                    # Contains baseline codebase
 │   ├── /info                        # Additional information about the project
-│   ├── /papers                      # Relevant research papers
 │   ├── rough.ipynb                  # A rough Jupyter notebook with preliminary work
 │   └── test.py                      # Test script for experimentation
 ├── /models                          # Empty, to store downloaded models (.pth files)
@@ -34,6 +33,7 @@ capsule-vision-2024/
 │   ├── data_setup.py                # Script for dataset setup
 │   └── ...                          # Other source code files for the project
 ├── /submission
+│   ├── submission_report.pdf        # Submission Report for the Challenge
 │   ├── metrics_report.json          # Report detailing the model's evaluation metrics
 │   ├── validation_excel.xlsx        # Validation results in Excel format
 │   └── Seq2Cure.xlsx                # Final submission in Excel format
