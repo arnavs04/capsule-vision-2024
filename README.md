@@ -2,7 +2,7 @@
 
 ## Team Information
 - **Team Name**: Seq2Cure
-- **Team Members**: Arnav Samal (NIT Rourkela) & Ranya (IGDTUW)
+- **Team Members**: Arnav Samal (NIT Rourkela) & Ranya (IGDTUW,Delhi)
 - **Challenge**: Capsule Vision 2024 - Multi-Class Abnormality Classification for Video Capsule Endoscopy
 
 ## Challenge Overview
@@ -60,7 +60,7 @@ The project implements a multi-model ensemble approach for video capsule endosco
 *For more specific details check the [submission report](submission/submission_report.pdf)*
 
 ### Model Architecture
-The ensemble incorporates implementations of established CNN and transformer architectures:
+The ensemble incorporates established CNN and transformer architectures:
 
 Traditional CNN Models:
 - EfficientNet
