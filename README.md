@@ -5,6 +5,8 @@
 - **Team Members**: Arnav Samal (NIT Rourkela) & Ranya (IGDTUW Delhi)
 - **Challenge**: Capsule Vision 2024 - Multi-Class Abnormality Classification for Video Capsule Endoscopy
 - **Results**: **Balanced Accuracy**: 0.8634, **Mean AUC-ROC**: 0.9908
+
+[Link to the Submission Report](https://arxiv.org/abs/2410.18879)
   
 ## Challenge Overview
 The Capsule Vision 2024 Challenge aims to develop AI-based models for multi-class abnormality classification in video capsule endoscopy (VCE) frames. By automating this process, the goal is to reduce the inspection time for gastroenterologists without compromising diagnostic precision. The dataset includes 10 class labels, and teams are evaluated on metrics such as accuracy and AUC.
