@@ -2,7 +2,7 @@
 
 ## Team Information
 - **Team Name**: Seq2Cure
-- **Team Members**: Arnav Samal (NIT Rourkela) & Ranya (IGDTUW,Delhi)
+- **Team Members**: Arnav Samal (NIT Rourkela) & Ranya (IGDTUW Delhi)
 - **Challenge**: Capsule Vision 2024 - Multi-Class Abnormality Classification for Video Capsule Endoscopy
 
 ## Challenge Overview
@@ -52,6 +52,12 @@ capsule-vision-2024/
 - **/reports**: Contains reports for each model, tracking performance and experiments.
 - **/src**: Includes all source code for the project, including data setup scripts and sample code provided by the challenge organizers.
 - **/submission**: The final output files for submission, including performance metrics and the Excel files required by the challenge organizers.
+
+## Data 
+
+The dataset comprises of over 50,000 frames from three public sources and one private dataset, labeled across 10 abnormality classes- Angioectasia, Bleeding, Erosion, Erythema, Foreign Body, Lymphangiect,Normal, Polyp,Worms. 
+*[Training & validation dataset](https://www.kaggle.com/datasets/arnavs19/capsule-vision-2024-data)*
+
 
 ## Methodology
 
