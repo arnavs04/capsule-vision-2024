@@ -55,7 +55,8 @@ capsule-vision-2024/
 
 ## Data 
 
-The dataset comprises of over 50,000 frames from three public sources and one private dataset, labeled across 10 abnormality classes- Angioectasia, Bleeding, Erosion, Erythema, Foreign Body, Lymphangiect,Normal, Polyp,Worms. 
+The dataset comprises of over 50,000 frames from three public sources and one private dataset, labeled across 10 abnormality classes- Angioectasia, Bleeding, Erosion, Erythema, Foreign Body, lymphangiectasia , Normal, Polyp, Worms. 
+
 *[Training & validation dataset](https://www.kaggle.com/datasets/arnavs19/capsule-vision-2024-data)*
 
 
