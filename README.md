@@ -4,7 +4,8 @@
 - **Team Name**: Seq2Cure
 - **Team Members**: Arnav Samal (NIT Rourkela) & Ranya (IGDTUW Delhi)
 - **Challenge**: Capsule Vision 2024 - Multi-Class Abnormality Classification for Video Capsule Endoscopy
-
+- **Results**: **Balanced Accuracy**: 0.8634, **Mean AUC-ROC**: 0.9909
+  
 ## Challenge Overview
 The Capsule Vision 2024 Challenge aims to develop AI-based models for multi-class abnormality classification in video capsule endoscopy (VCE) frames. By automating this process, the goal is to reduce the inspection time for gastroenterologists without compromising diagnostic precision. The dataset includes 10 class labels, and teams are evaluated on metrics such as accuracy and AUC.
 
@@ -55,7 +56,7 @@ capsule-vision-2024/
 
 ## Data 
 
-The dataset comprises of over 50,000 frames from three public sources and one private dataset, labeled across 10 abnormality classes- Angioectasia, Bleeding, Erosion, Erythema, Foreign Body, lymphangiectasia , Normal, Polyp, Worms. 
+The dataset comprises of over 50,000 frames from three public sources and one private dataset, labeled across 10 abnormality classes- Angioectasia, Bleeding, Erosion, Erythema, Foreign Body, Lymphangiectasia, Normal, Polyp, Worms. 
 
 *[Training & validation dataset](https://www.kaggle.com/datasets/arnavs19/capsule-vision-2024-data)*
 
