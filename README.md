@@ -4,7 +4,7 @@
 - **Team Name**: Seq2Cure
 - **Team Members**: Arnav Samal (NIT Rourkela) & Ranya (IGDTUW Delhi)
 - **Challenge**: Capsule Vision 2024 - Multi-Class Abnormality Classification for Video Capsule Endoscopy
-- **Results**: **Balanced Accuracy**: 0.8634, **Mean AUC-ROC**: 0.9908, **Rank**: 5th
+- **Results**: **Rank**: 5th, **Balanced Accuracy**: 0.8634, **Mean AUC-ROC**: 0.9908
 
 [Link to the Submission Report](https://arxiv.org/abs/2410.18879)
   
